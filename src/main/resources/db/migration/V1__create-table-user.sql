@@ -9,4 +9,4 @@ create table user(
   PRIMARY KEY (`id`)
 );
 INSERT INTO user (name, last_name, email, password, phone, birthday)
-VALUES ('user', 'admin', 'user@admin.com', 'admin', '1234567890', '2024-01-01');
+VALUES ('user', 'admin', 'user@admin.com', '$2a$10$4DnFl0oGGyfPSdChwfHKMuX1lCS6ZqoeuLHW.DzMsDSSJyQLjxZSO', '3001112233', '2024-01-01');
