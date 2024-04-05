@@ -1,6 +1,9 @@
 package com.unaux.dairo.api.controller;
 
+import com.unaux.dairo.api.domain.user.User;
 import com.unaux.dairo.api.domain.user.UserAuthenticationDto;
+import com.unaux.dairo.api.infra.security.JwtTokenDto;
+import com.unaux.dairo.api.infra.security.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/login")
 public class AuthenticationController {
 
-  // para disparar el proceso de autenticación en spring existe la clase AuthenticationManager
+  // para disparar el proceso de autenticación en spring existe la clase
+  // AuthenticationManager
   @Autowired
-  private AuthenticationManager authenticationManager; // es una interfaz proporcionada por Spring Security para manejar la autenticación.
+  private AuthenticationManager authenticationManager; // es una interfaz proporcionada por Spring Security para manejar
 
-  // Este método toma un objeto UserAuthenticationDto como parámetro, que probablemente contiene las credenciales del usuario (email y password)
+  // la autenticación.
+
+  @Autowired
+  private TokenService tokenService;
+
+  // Este método toma un objeto UserAuthenticationDto como parámetro, que
+  // probablemente contiene las credenciales del usuario (email y password)
   @PostMapping
   public ResponseEntity authenticateUser(
     @RequestBody @Valid UserAuthenticationDto userAuthenticationDto
@@ -32,10 +42,15 @@ public class AuthenticationController {
       userAuthenticationDto.password()
     );
 
-    // se llama al método authenticate del AuthenticationManager para verificar las credenciales del usuario.
-    authenticationManager.authenticate(authToken);
+    // se llama al método authenticate del AuthenticationManager para verificar las
+    // credenciales del usuario.
+    var authenticatedUser = authenticationManager.authenticate(authToken);
+
+    var JwtToken = tokenService.createToken(
+      (User) authenticatedUser.getPrincipal()
+    );
 
     // Si la autenticación es exitosa, devuelve una respuesta HTTP 200 (OK)
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok(new JwtTokenDto(JwtToken));
   }
 }
