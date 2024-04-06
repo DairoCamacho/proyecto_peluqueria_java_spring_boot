@@ -5,7 +5,6 @@ import com.unaux.dairo.api.domain.user.UserAuthenticationDto;
 import com.unaux.dairo.api.infra.security.JwtTokenDto;
 import com.unaux.dairo.api.infra.security.TokenService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,13 +21,17 @@ public class AuthenticationController {
 
   // para disparar el proceso de autenticación en spring existe la clase
   // AuthenticationManager
-  @Autowired
-  private AuthenticationManager authenticationManager; // es una interfaz proporcionada por Spring Security para manejar
+  private final AuthenticationManager authenticationManager; // es una interfaz proporcionada por Spring Security para manejar la autenticación.
 
-  // la autenticación.
+  private final TokenService tokenService;
 
-  @Autowired
-  private TokenService tokenService;
+  AuthenticationController(
+    AuthenticationManager authenticationManager,
+    TokenService tokenService
+  ) {
+    this.authenticationManager = authenticationManager;
+    this.tokenService = tokenService;
+  }
 
   // Este método toma un objeto UserAuthenticationDto como parámetro, que
   // probablemente contiene las credenciales del usuario (email y password)
