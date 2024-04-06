@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  java_app:
+    container_name: java_app
+    image: java-app:1.0.0
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=jdbc:mysql://java_db:3306/siac
+      - DATABASE_USERNAME=root
+      - DATABASE_PASSWORD=my-secret-pw
+      - JWT_SECRET=clave123
+    depends_on:
+      java_db:
+        condition: service_healthy
+
+  java_db:
+    container_name: java_db
+    image: mysql:8.3.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+      - MYSQL_DATABASE=siac
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost --silent" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
