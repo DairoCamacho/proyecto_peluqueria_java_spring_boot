@@ -1,7 +1,9 @@
 package com.unaux.dairo.api.infra.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 // Esta clase es una configuración de seguridad que utiliza anotaciones de Spring para definir cómo se debe manejar la seguridad en la aplicación.
 // Está anotada con @Configuration, lo que indica que contiene configuración de beans.
@@ -17,6 +20,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurations {
+
+  @Autowired
+  private SecurityFilter securityFilter;
 
   // Este método crea y configura un filtro de seguridad llamado springSecurityFilterChain.
   @Bean
@@ -30,6 +36,16 @@ public class SecurityConfigurations {
       .sessionManagement()
       .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
       .and()
+      .authorizeRequests()
+      .requestMatchers(HttpMethod.POST, "api/login")
+      .permitAll()
+      .anyRequest()
+      .authenticated()
+      .and()
+      .addFilterBefore(
+        securityFilter,
+        UsernamePasswordAuthenticationFilter.class
+      )
       .build();
   }
 
