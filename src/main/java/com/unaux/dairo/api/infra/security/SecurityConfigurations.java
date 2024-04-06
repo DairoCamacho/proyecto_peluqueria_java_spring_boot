@@ -1,6 +1,5 @@
 package com.unaux.dairo.api.infra.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,8 +20,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfigurations {
 
-  @Autowired
-  private SecurityFilter securityFilter;
+  private final SecurityFilter securityFilter;
+
+  SecurityConfigurations(SecurityFilter securityFilter) {
+    this.securityFilter = securityFilter;
+  }
 
   // Este método crea y configura un filtro de seguridad llamado springSecurityFilterChain.
   @Bean

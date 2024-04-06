@@ -9,10 +9,14 @@ import com.unaux.dairo.api.domain.user.User;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenService {
 
   @Value("${api.security.secret}")
