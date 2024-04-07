@@ -8,5 +8,6 @@ public record ClientResponseDto(
         String lastName,
         String phone,
         LocalDate birthday,
-        String email) {
+        String email,
+        String type) {
 }

@@ -40,7 +40,8 @@ public class ClientController {
       client.getLastName(),
       client.getPhone(),
       client.getBirthday(),
-      client.getEmail()
+      client.getEmail(),
+      client.getType()
     );
     URI url = uriComponentsBuilder
       .path("/client/{id}")
@@ -66,7 +67,8 @@ public class ClientController {
       client.getLastName(),
       client.getPhone(),
       client.getBirthday(),
-      client.getEmail()
+      client.getEmail(),
+      client.getType()
     );
     return ResponseEntity.ok(response);
   }
@@ -76,24 +78,57 @@ public class ClientController {
   public ResponseEntity<ClientResponseDto> updateClient(
     @RequestBody @Valid ClientUpdateDto clientUpdateDto
   ) {
+    // con el ID recibido buscamos en DB y almacenamos los datos existentes en client
     Client client = clientRepository.getReferenceById(clientUpdateDto.id());
-    if (!client.getPassword().equals(clientUpdateDto.password())) {
+
+    // verificamos que la contraseña coincida con la guardada en la base de datos
+    if (!client.matchesPassword(clientUpdateDto.password(), client.getPassword())) {
       return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .header("Error-Password", "current password does not match")
         .build();
     }
-    if (
-      clientUpdateDto.newPassword().equals(clientUpdateDto.confirmPassword())
-    ) {
-      return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
-        .header(
-          "Error-Password",
-          "newPassword and confirmPassword do not match"
-        )
-        .build();
+
+    // si el cliente quiere actualizar su contraseña
+    if (clientUpdateDto.newPassword() != null) {
+      // verificamos que newPassword no sea igual que la contraseña actual
+      if (clientUpdateDto.newPassword().equals(clientUpdateDto.password())) {
+        return ResponseEntity
+          .status(HttpStatus.NOT_FOUND)
+          .header("Error-Password", "Password and newPassword are equals")
+          .build();
+      }
+
+      // verificamos que newPassword y confirmPassword no sea vacíos o null
+      if (
+        clientUpdateDto.newPassword() == "" ||
+        clientUpdateDto.confirmPassword() == "" ||
+        clientUpdateDto.newPassword() == null ||
+        clientUpdateDto.confirmPassword() == null
+      ) {
+        return ResponseEntity
+          .status(HttpStatus.NOT_FOUND)
+          .header(
+            "Error-Password",
+            "newPassword or confirmPassword is empty or null"
+          )
+          .build();
+      }
+
+      // verificamos que newPassword y confirmPassword sean iguales
+      if (
+        !clientUpdateDto.newPassword().equals(clientUpdateDto.confirmPassword())
+      ) {
+        return ResponseEntity
+          .status(HttpStatus.NOT_FOUND)
+          .header(
+            "Error-Password",
+            "newPassword and confirmPassword do not match"
+          )
+          .build();
+      }
     }
+
     client.update(clientUpdateDto);
     ClientResponseDto response = new ClientResponseDto(
       client.getId(),
@@ -101,7 +136,8 @@ public class ClientController {
       client.getLastName(),
       client.getPhone(),
       client.getBirthday(),
-      client.getEmail()
+      client.getEmail(),
+      client.getType()
     );
     return ResponseEntity.ok(response);
   }

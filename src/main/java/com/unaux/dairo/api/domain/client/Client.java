@@ -48,6 +48,9 @@ public class Client extends User {
     if (clientUpdateDto.email() != null) {
       setEmail(clientUpdateDto.email());
     }
+    if (clientUpdateDto.newPassword() != null) {
+      setPassword(encryptPassword(clientUpdateDto.newPassword()));
+    }
   }
 
   public void inactivate() {
@@ -57,5 +60,10 @@ public class Client extends User {
   public String encryptPassword(String password) {
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     return encoder.encode(password);
+  }
+
+  public boolean matchesPassword(String rawPassword, String encodedPassword) {
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    return encoder.matches(rawPassword, encodedPassword);
   }
 }
