@@ -22,17 +22,18 @@ import lombok.ToString;
 @Entity
 @Table(name = "hair_salon")
 public class HairSalon {
-  
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-  
-    private String name;
-    private String phone;
-    private String address;
-    private String neighborhood;
-    private String city;
-    private String country;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private int id;
+
+  private String name;
+  private String phone;
+  private String address;
+  private String neighborhood;
+  private String city;
+  private String country;
+  private boolean status;
 
   public HairSalon(@Valid HairSalonCreateDto hairSalonCreateDto) {
     setName(hairSalonCreateDto.name());
@@ -62,5 +63,9 @@ public class HairSalon {
     if (hairSalonUpdateDto.country() != null) {
       setCountry(hairSalonUpdateDto.country());
     }
+  }
+
+  public void inactive() {
+    setStatus(false);
   }
 }
