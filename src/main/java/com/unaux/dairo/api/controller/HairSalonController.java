@@ -12,6 +12,7 @@ import java.net.URI;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -115,5 +116,18 @@ public class HairSalonController {
       hairSalon.getCountry()
     );
     return ResponseEntity.ok(response);
+  }
+
+  @DeleteMapping("/{id}")
+  @Transactional
+  public ResponseEntity deleteHairSalon(@PathVariable int id){
+    // con el ID buscamos en DB y almacenamos el objeto en la variable
+    HairSalon hairSalon = hairSalonRepository.getReferenceById(id);
+
+    // Cambiamos el estado del objeto a inactivo
+    hairSalon.inactive(); 
+
+    // Retornamos una respuesta vacía
+    return ResponseEntity.noContent().build(); 
   }
 }
