@@ -4,7 +4,9 @@ import com.unaux.dairo.api.domain.hairsalon.HairSalon;
 import com.unaux.dairo.api.domain.hairsalon.HairSalonCreateDto;
 import com.unaux.dairo.api.domain.hairsalon.HairSalonFindDto;
 import com.unaux.dairo.api.domain.hairsalon.HairSalonResponseDto;
+import com.unaux.dairo.api.domain.hairsalon.HairSalonUpdateDto;
 import com.unaux.dairo.api.repository.HairSalonRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.data.domain.Page;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,12 +65,12 @@ public class HairSalonController {
   @GetMapping
   public ResponseEntity<Page<HairSalonFindDto>> listHairSalon(
     Pageable paginacion // Parámetro para recibir la paginación de la petición del frontend
-    ) {
+  ) {
     //
     return ResponseEntity.ok(
       hairSalonRepository
-      .findAll(paginacion) // Obtenemos todos los registros de la base de datos
-      .map(HairSalonFindDto::new) // Mapeamos los registros a un DTO
+        .findAll(paginacion) // Obtenemos todos los registros de la base de datos
+        .map(HairSalonFindDto::new) // Mapeamos los registros a un DTO
     );
   }
 
@@ -75,6 +78,32 @@ public class HairSalonController {
   public ResponseEntity<HairSalonResponseDto> findHairSalon(@PathVariable int id){
     // Aquí obtenemos una referencia del objeto en la base de datos
     HairSalon hairSalon = hairSalonRepository.getReferenceById(id);
+    // Creamos un DTO para retornar el objeto al frontend
+    HairSalonResponseDto response = new HairSalonResponseDto(
+      hairSalon.getId(),
+      hairSalon.getName(),
+      hairSalon.getPhone(),
+      hairSalon.getAddress(),
+      hairSalon.getNeighborhood(),
+      hairSalon.getCity(),
+      hairSalon.getCountry()
+    );
+    return ResponseEntity.ok(response);
+  }
+
+  @PutMapping
+  @Transactional
+  public ResponseEntity<HairSalonResponseDto> updateHairSalon(
+    @RequestBody @Valid HairSalonUpdateDto hairSalonUpdateDto
+  ) {
+    // con el ID buscamos en DB y almacenamos los datos en la variable
+    HairSalon hairSalon = hairSalonRepository.getReferenceById(
+      hairSalonUpdateDto.id()
+    );
+
+    // Actualizamos el objeto con los datos del DTO
+    hairSalon.update(hairSalonUpdateDto);
+
     // Creamos un DTO para retornar el objeto al frontend
     HairSalonResponseDto response = new HairSalonResponseDto(
       hairSalon.getId(),
