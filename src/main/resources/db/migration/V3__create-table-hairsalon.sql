@@ -10,4 +10,7 @@ CREATE TABLE `hair_salon` (
   PRIMARY KEY (`id`)
   );
 INSERT INTO hair_salon (name, phone, address, neighborhood, city, country, status)
-VALUES ('Alejandra', 'tel000', 'cll 1 cra 1 #55-66', 'Centro', 'city', 'country', 1);
+VALUES ('Alejandra', 'tel111', 'cll 1 cra 1 #11-11', 'Centro', 'city', 'country', 1);
+
+INSERT INTO hair_salon (name, phone, address, neighborhood, city, country, status)
+VALUES ('Alejandra Sucursal', 'tel222', 'cll 2 cra 2 #22-22', 'Centro', 'city', 'country', 1);

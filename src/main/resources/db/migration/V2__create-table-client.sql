@@ -8,3 +8,6 @@ create table `client` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 );
+INSERT INTO client (id, type) VALUES (4, 'premium');
+INSERT INTO client (id, type) VALUES (5, 'regular');
+INSERT INTO client (id, type) VALUES (6, 'new');
