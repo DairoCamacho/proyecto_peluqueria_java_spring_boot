@@ -15,15 +15,20 @@ https://github.com/DairoCamacho/api-springboot-hairsalon.git
 Para desplegar este proyecto ejecute el comando:
 
 ```bash
-  ./mvnw clean package -DskipTest && java -jar api-0.0.1-SNAPSHOT.jar
+  ./mvnw clean compile
+  ./mvnw -DskipTests=true install
+  
+```
+```bash
+   docker compose up
 ```
 
 
 ## Variables de entorno
 
-Para ejecutar este proyecto, deberá agregar las siguientes variables de entorno a su archivo .env
+El proyecto usa las siguientes variables de entorno:
 
-`DATABASE_UR`
+`DATABASE_URL`
 
 `DATABASE_USERNAME`
 
@@ -34,11 +39,9 @@ Para ejecutar este proyecto, deberá agregar las siguientes variables de entorno
 
 ## Requisitos previos
 
-Para este proyecto requiere de los siguientes componentes:
-
-```bash
+Para este proyecto requiere el uso de [Docker Desktop](https://www.docker.com/products/docker-desktop/), 
+sin embargo también puede ser desplegado haciendo uso  de los siguientes componentes:
+  
   [jdk version 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
-  [Apache Maven](https://maven.apache.org/download.cgi)
+  [Maven](https://maven.apache.org/download.cgi)
   [MySQL (Ejecutandose previamente)](https://www.apachefriends.org/download.html)
-```
-    
