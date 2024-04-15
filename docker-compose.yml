@@ -1,11 +1,10 @@
-version: '3.8'
 services:
   java_app:
     container_name: java_app
     image: java-app:1.0.0
     build: .
     ports:
-      - "8080:8080"
+      - "6543:8080"
     environment:
       - DATABASE_URL=jdbc:mysql://java_db:3306/siac
       - DATABASE_USERNAME=root
@@ -17,9 +16,7 @@ services:
 
   java_db:
     container_name: java_db
-    image: mysql:8.3.0
-    ports:
-      - "3306:3306"
+    image: mysql:8.0
     environment:
       - MYSQL_ROOT_PASSWORD=my-secret-pw
       - MYSQL_DATABASE=siac
@@ -28,3 +25,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+networks:
+  backed:
+    driver: bridge
