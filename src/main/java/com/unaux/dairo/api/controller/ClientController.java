@@ -44,7 +44,7 @@ public class ClientController {
       client.getType()
     );
     URI url = uriComponentsBuilder
-      .path("/client/{id}")
+      .path("api/client/{id}")
       .buildAndExpand(client.getId())
       .toUri();
     return ResponseEntity.created(url).body(response);
