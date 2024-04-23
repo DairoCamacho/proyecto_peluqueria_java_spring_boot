@@ -65,12 +65,12 @@ public class HairSalonController {
 
   @GetMapping
   public ResponseEntity<Page<HairSalonFindDto>> listHairSalon(
-    Pageable paginacion // Parámetro para recibir la paginación de la petición del frontend
+    Pageable pagination // Parámetro para recibir la paginación de la petición del frontend
   ) {
     //
     return ResponseEntity.ok(
       hairSalonRepository
-        .findAll(paginacion) // Obtenemos todos los registros de la base de datos
+        .findAll(pagination) // Obtenemos todos los registros de la base de datos
         .map(HairSalonFindDto::new) // Mapeamos los registros a un DTO
     );
   }

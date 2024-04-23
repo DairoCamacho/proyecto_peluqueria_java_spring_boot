@@ -1,13 +1,10 @@
 CREATE TABLE `working_hours` (
 `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `start_date` TIMESTAMP NOT NULL,
-  `end_date` TIMESTAMP NULL,
-  `employee_id` INT(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`employee_id`)
-    REFERENCES `siac`.`employee` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
+`start_date` TIMESTAMP NOT NULL,
+`end_date` TIMESTAMP NULL,
+`employee_id` INT(11) NOT NULL,
+PRIMARY KEY (`id`),
+FOREIGN KEY (`employee_id`) REFERENCES `siac`.`employee` (`id`)
 );
 
 INSERT INTO `working_hours` (`id`, `start_date`, `end_date`, `employee_id`) 

@@ -1,16 +1,13 @@
-create table `service` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
-  `price` INT(11) NOT NULL,
-  `duration` TIME NOT NULL,
-  `hair_salon_id` INT(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_service_hair_salon1_idx` (`hair_salon_id` ASC),
-  FOREIGN KEY (`hair_salon_id`)
-    REFERENCES `siac`.`hair_salon` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
+CREATE TABLE `service` (
+`id` INT(11) NOT NULL AUTO_INCREMENT,
+`name` VARCHAR(45) NOT NULL,
+`price` INT(11) NOT NULL,
+`duration` TIME NOT NULL,
+`hair_salon_id` INT(11) NOT NULL,
+PRIMARY KEY (`id`),
+FOREIGN KEY (`hair_salon_id`) REFERENCES `hair_salon` (`id`)
 );
+
 INSERT INTO service (name, price, duration, hair_salon_id)
 VALUES ('Corte de pelo', 15000, '00:30:00', 1);
 
