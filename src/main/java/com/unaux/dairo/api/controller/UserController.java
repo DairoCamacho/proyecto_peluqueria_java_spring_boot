@@ -45,9 +45,11 @@ public class UserController {
   }
 
   // CONSULTAR TODOS LOS USUARIOS
-  @GetMapping("/all")
-  public List<User> listAllUsers() {
-    return userRepository.findAll();
+  @GetMapping
+  public ResponseEntity<Page<UserFindDto>> listAllUsers(Pageable pagination) {
+    return ResponseEntity.ok(
+      userRepository.findAll(pagination).map(UserFindDto::new)
+    );
   }
 
   // CONSULTAR TODOS LOS USUARIOS HÁBILES
@@ -76,23 +78,7 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-  /* 
-  // Otras formas de hacer la consulta
-  @GetMapping("/{id}")
-  public ResponseEntity<User> findUser(@PathVariable int id) {
-    Optional<User> user = userRepository.findById(id);
-    return user
-      .map(ResponseEntity::ok)
-      .orElse(ResponseEntity.notFound().build());
-  }
-
-  @GetMapping("/{id}")
-  public User findUser(@PathVariable int id) {
-    return userRepository.getReferenceById(id);
-  }
- */
-
-  @PutMapping("/{id}")
+  @PutMapping
   public ResponseEntity<UserResponseDto> updateUser(
     @RequestBody UserUpdateDto userUpdateDto
   ) {
@@ -156,7 +142,6 @@ public class UserController {
 
     return ResponseEntity.ok(response);
   }
-
 
   /*
   // option 2
