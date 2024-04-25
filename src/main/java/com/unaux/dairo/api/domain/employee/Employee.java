@@ -7,11 +7,12 @@ import com.unaux.dairo.api.domain.workinghours.WorkingHours;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.Set;
@@ -31,8 +32,11 @@ import lombok.ToString;
 public class Employee {
 
   @Id
-  @OneToOne
-  @JoinColumn(name = "id", referencedColumnName = "id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private int id;
+
+  @ManyToOne
+  @JoinColumn(name = "client_id", referencedColumnName = "id")
   private Client client;
 
   @Column(name = "position", nullable = false, length = 45)
@@ -41,15 +45,11 @@ public class Employee {
   @Column(name = "hire_date", nullable = false)
   private LocalDate hireDate;
 
-  @Column(name = "termination_date")
+  @Column(name = "termination_date", nullable = true)
   private LocalDate terminationDate;
 
   @ManyToOne
-  @JoinColumn(
-    name = "hair_salon_id",
-    referencedColumnName = "id",
-    nullable = false
-  )
+  @JoinColumn(name = "hair_salon_id", referencedColumnName = "id")
   private HairSalon hairSalon;
 
   @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
@@ -57,4 +57,30 @@ public class Employee {
 
   @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
   private Set<Appointment> appointments;
+
+  public Employee(
+    EmployeeCreateDto employeeCreateDto,
+    Client client,
+    HairSalon hairSalon
+  ) {
+    this.client = client;
+    this.position = employeeCreateDto.position();
+    this.hireDate = employeeCreateDto.hireDate();
+    this.hairSalon = hairSalon;
+  }
+
+  public void update(EmployeeUpdateDto employeeUpdateDto, HairSalon hairSalon) {
+    if (employeeUpdateDto.position() != null) {
+      setPosition(employeeUpdateDto.position());
+    }
+    if (employeeUpdateDto.hireDate() != null) {
+      setHireDate(employeeUpdateDto.hireDate());
+    }
+    if (employeeUpdateDto.terminationDate() != null) {
+      setTerminationDate(employeeUpdateDto.terminationDate());
+    }
+    if (employeeUpdateDto.hairSalonId() > 0) {
+      setHairSalon(hairSalon);
+    }
+  }
 }

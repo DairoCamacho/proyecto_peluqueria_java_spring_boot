@@ -2,22 +2,24 @@ package com.unaux.dairo.api.domain.hairsalon;
 
 public record HairSalonFindDto(
   int id,
-  String name,
-  String phone,
   String address,
-  String neighborhood,
   String city,
-  String country
+  String country,
+  String name,
+  String neighborhood,
+  String phone,
+  boolean status
 ) {
     public HairSalonFindDto(HairSalon hairSalon){
         this(
             hairSalon.getId(),
-            hairSalon.getName(),
-            hairSalon.getPhone(),
             hairSalon.getAddress(),
-            hairSalon.getNeighborhood(),
             hairSalon.getCity(),
-            hairSalon.getCountry()
+            hairSalon.getCountry(),
+            hairSalon.getName(),
+            hairSalon.getNeighborhood(),
+            hairSalon.getPhone(),
+            hairSalon.isStatus()
         );
     }
 }

@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -93,7 +94,18 @@ public class ClientController {
   }
 
   @GetMapping
-  public ResponseEntity<Page<ClientFindDto>> listClient(Pageable pagination) {
+  public ResponseEntity<Page<ClientFindDto>> listAllClient(
+    Pageable pagination
+  ) {
+    return ResponseEntity.ok(
+      clientRepository.findAll(pagination).map(ClientFindDto::new)
+    );
+  }
+
+  @GetMapping("/enabled")
+  public ResponseEntity<Page<ClientFindDto>> listEnabledClient(
+    Pageable pagination
+  ) {
     // return clientRepository.findAll(pagination).map(ClientFindDto::new);
     return ResponseEntity.ok(
       clientRepository
@@ -103,11 +115,39 @@ public class ClientController {
   }
 
   @GetMapping("/{id}")
+  public ResponseEntity findClient(@PathVariable int id) {
+    Optional<Client> clientOptional = clientRepository.findById(id);
+
+    if (clientOptional.isPresent()) {
+      Client client = clientOptional.get();
+      ClientResponseDto response = new ClientResponseDto(
+        client.getId(),
+        client.getBirthday(),
+        client.getLastName(),
+        client.getName(),
+        client.getPhone(),
+        client.getType(),
+        client.getUser().getEmail()
+      );
+
+      return ResponseEntity.ok(response);
+    } else {
+      // Enviar un código de estado HTTP apropiado, como 404 Not Found
+      return ResponseEntity.notFound().build();
+      // Enviar un código de estado HTTP 404 Not Found con un mensaje en el cuerpo
+      // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El recurso solicitado no se encontró");
+    }
+  }
+
+  /*
+  // Otras formas de hacer la consulta
+
+  @GetMapping("/{id}")
   public ResponseEntity<ClientResponseDto> findClient(@PathVariable int id) {
     // con el id buscamos en DB y guardamos dentro de "user"
-    Client client = clientRepository.getReferenceById(id);
+    Client client = clientRepository.findById(id).orElseThrow(() -> new RuntimeException("Client not found"));
+    // Client client = clientRepository.getReferenceById(id);
 
-    // para no devolver todos los datos, usaremos el DTO
     ClientResponseDto response = new ClientResponseDto(
       client.getId(),
       client.getBirthday(),
@@ -120,7 +160,19 @@ public class ClientController {
     return ResponseEntity.ok(response);
   }
 
-  @PutMapping("/{id}")
+  @GetMapping("/{id}")
+  public Client findClient(@PathVariable int id) {
+    return clientRepository.getReferenceById(id);
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<Client> findClient(@PathVariable int id) {
+    Optional<Client> client = clientRepository.findById(id);
+    return client.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+  }
+   */
+
+  @PutMapping
   @Transactional
   public ResponseEntity<ClientResponseDto> updateClient(
     @RequestBody @Valid ClientUpdateDto clientUpdateDto

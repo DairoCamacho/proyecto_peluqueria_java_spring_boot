@@ -65,9 +65,8 @@ public class HairSalonController {
 
   @GetMapping
   public ResponseEntity<Page<HairSalonFindDto>> listHairSalon(
-    Pageable pagination // Parámetro para recibir la paginación de la petición del frontend
+    Pageable pagination
   ) {
-    //
     return ResponseEntity.ok(
       hairSalonRepository
         .findAll(pagination) // Obtenemos todos los registros de la base de datos
@@ -76,7 +75,9 @@ public class HairSalonController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<HairSalonResponseDto> findHairSalon(@PathVariable int id){
+  public ResponseEntity<HairSalonResponseDto> findHairSalon(
+    @PathVariable int id
+  ) {
     // Aquí obtenemos una referencia del objeto en la base de datos
     HairSalon hairSalon = hairSalonRepository.getReferenceById(id);
     // Creamos un DTO para retornar el objeto al frontend
@@ -120,14 +121,14 @@ public class HairSalonController {
 
   @DeleteMapping("/{id}")
   @Transactional
-  public ResponseEntity deleteHairSalon(@PathVariable int id){
+  public ResponseEntity deleteHairSalon(@PathVariable int id) {
     // con el ID buscamos en DB y almacenamos el objeto en la variable
     HairSalon hairSalon = hairSalonRepository.getReferenceById(id);
 
     // Cambiamos el estado del objeto a inactivo
-    hairSalon.inactive(); 
+    hairSalon.inactive();
 
     // Retornamos una respuesta vacía
-    return ResponseEntity.noContent().build(); 
+    return ResponseEntity.noContent().build();
   }
 }
