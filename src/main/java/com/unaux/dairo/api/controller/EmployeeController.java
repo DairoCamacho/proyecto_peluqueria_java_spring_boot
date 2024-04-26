@@ -124,7 +124,6 @@ public class EmployeeController {
   public ResponseEntity<EmployeeResponseDto> updateEmployee(
     @RequestBody @Valid EmployeeUpdateDto employeeUpdateDto
   ) {
-    System.out.println(employeeUpdateDto.id());
 
     // Employee employee = employeeRepository
     //   .findById(employeeUpdateDto.id())

@@ -50,15 +50,15 @@ public class SecurityConfigurations {
         cors.configurationSource(source);
       })
       .csrf()
-      .disable()
+        .disable()
       .sessionManagement()
-      .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
       .and()
       .authorizeRequests()
-      .requestMatchers(HttpMethod.POST, "api/login")
-      .permitAll()
-      .anyRequest()
-      .authenticated()
+        .requestMatchers(HttpMethod.POST, "api/login", "/api/client")
+        .permitAll()
+        .anyRequest()
+        .authenticated()
       .and()
       .addFilterBefore(
         securityFilter,

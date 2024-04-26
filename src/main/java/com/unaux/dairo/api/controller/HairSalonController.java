@@ -64,7 +64,7 @@ public class HairSalonController {
   }
 
   @GetMapping
-  public ResponseEntity<Page<HairSalonFindDto>> listHairSalon(
+  public ResponseEntity<Page<HairSalonFindDto>> listAllHairSalon(
     Pageable pagination
   ) {
     return ResponseEntity.ok(

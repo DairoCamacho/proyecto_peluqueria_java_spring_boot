@@ -128,6 +128,7 @@ public class ServiceController {
     return ResponseEntity.ok(response);
   }
 
+  // OJO: delete físico
   @DeleteMapping("/{id}")
   public void deleteService(@PathVariable int id) {
     Service service = serviceRepository
