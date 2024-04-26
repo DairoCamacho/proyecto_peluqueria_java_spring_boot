@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 
 @Getter
 @Setter
@@ -29,8 +30,15 @@ import lombok.ToString;
 public class Appointment {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+  @GeneratedValue(
+    strategy = GenerationType.SEQUENCE,
+    generator = "appointmentIdGenerator"
+  ) // Cambiado a SEQUENCE
+  @GenericGenerator(
+    name = "appointmentIdGenerator",
+    strategy = "com.unaux.dairo.api.domain.appointment.AppointmentIdGenerator"
+  )
+  private String id;
 
   @Column(name = "date", nullable = false)
   private LocalDate date;
@@ -63,4 +71,44 @@ public class Appointment {
   @ManyToOne
   @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
   private Client client;
+
+  public Appointment(
+    AppointmentCreateDto appointmentCreateDto,
+    Service service,
+    Employee employee,
+    Client client
+  ) {
+    this.date = appointmentCreateDto.date();
+    this.time = appointmentCreateDto.time();
+    this.status = "pending";
+    this.notes = appointmentCreateDto.notes();
+    this.service = service;
+    this.employee = employee;
+    this.client = client;
+  }
+
+  public void update(
+    AppointmentUpdateDto appointmentUpdateDto,
+    Service service,
+    Employee employee
+  ) {
+    if (appointmentUpdateDto.date() != null) {
+      setDate(appointmentUpdateDto.date());
+    }
+    if (appointmentUpdateDto.time() != null) {
+      setTime(appointmentUpdateDto.time());
+    }
+    if (appointmentUpdateDto.status() != null) {
+      setStatus(appointmentUpdateDto.status());
+    }
+    if (appointmentUpdateDto.notes() != null) {
+      setNotes(appointmentUpdateDto.notes());
+    }
+    if (service.getId() > 0) {
+      setService(service);
+    }
+    if (employee.getId() > 0) {
+      setEmployee(employee);
+    }
+  }
 }
