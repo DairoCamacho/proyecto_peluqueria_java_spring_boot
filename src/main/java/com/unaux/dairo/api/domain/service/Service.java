@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.Valid;
 import java.time.LocalTime;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
@@ -31,13 +32,13 @@ public class Service {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+  private int id;
 
   @Column(name = "name", nullable = false, length = 45)
   private String name;
 
   @Column(name = "price", nullable = false)
-  private Integer price;
+  private int price;
 
   @Column(name = "duration", nullable = false)
   private LocalTime duration;
@@ -52,4 +53,29 @@ public class Service {
 
   @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
   private Set<Appointment> appointments;
+
+  public Service(
+    @Valid ServiceCreateDto serviceCreateDto,
+    HairSalon hairSalon
+  ) {
+    this.name = serviceCreateDto.name();
+    this.price = serviceCreateDto.price();
+    this.duration = serviceCreateDto.duration();
+    this.hairSalon = hairSalon;
+  }
+
+  public void update(ServiceUpdateDto serviceUpdateDto, HairSalon hairSalon) {
+    if (serviceUpdateDto.name() != null) {
+      setName(serviceUpdateDto.name());
+    }
+    if (serviceUpdateDto.price() > 0) {
+      setPrice(serviceUpdateDto.price());
+    }
+    if (serviceUpdateDto.duration() != null) {
+      setDuration(serviceUpdateDto.duration());
+    }
+    if (serviceUpdateDto.hairSalonId() > 0) {
+      setHairSalon(hairSalon);
+    }
+  }
 }
