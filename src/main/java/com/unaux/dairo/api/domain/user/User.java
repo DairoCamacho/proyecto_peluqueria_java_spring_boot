@@ -3,6 +3,8 @@ package com.unaux.dairo.api.domain.user;
 import com.unaux.dairo.api.domain.client.Client;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -52,8 +54,9 @@ public class User implements UserDetails {
   @Column(name = "password", nullable = false, length = 300)
   private String password;
 
+  @Enumerated(EnumType.ORDINAL)
   @Column(name = "role", nullable = false, length = 255)
-  private String role;
+  private Role role;
 
   @Column(name = "status", nullable = false)
   private boolean status;
@@ -63,7 +66,7 @@ public class User implements UserDetails {
     setClient(client);
     setEmail(email);
     setPassword(encryptPassword(password));
-    setRole("client");
+    setRole(Role.CLIENT);
     setStatus(true);
   }
 
@@ -107,7 +110,7 @@ public class User implements UserDetails {
   // La autoridad "ROLE_USER" es comúnmente utilizada para representar a los usuarios normales en un sistema.
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    return List.of(new SimpleGrantedAuthority(role.name()));
   }
 
   @Override

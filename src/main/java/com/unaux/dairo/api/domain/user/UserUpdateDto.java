@@ -7,7 +7,7 @@ public record UserUpdateDto(
   String email,
   boolean status,
   String password,
-  String role,
+  Role role,
   String newPassword,
   String confirmPassword
 ) {}

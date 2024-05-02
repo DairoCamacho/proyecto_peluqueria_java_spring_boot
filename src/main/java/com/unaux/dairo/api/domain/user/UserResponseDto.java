@@ -4,5 +4,5 @@ public record UserResponseDto(
   int id,
   String email,
   boolean status,
-  String role
+  Role role
 ) {}

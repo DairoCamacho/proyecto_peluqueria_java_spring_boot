@@ -1,6 +1,7 @@
 package com.unaux.dairo.api.infra.security;
 
 import com.unaux.dairo.api.domain.client.Client;
+import com.unaux.dairo.api.domain.user.Role;
 import com.unaux.dairo.api.domain.user.User;
 import com.unaux.dairo.api.repository.ClientRepository;
 import com.unaux.dairo.api.repository.UserRepository;
@@ -50,7 +51,7 @@ public class DataLoader implements CommandLineRunner {
       user.setClient(savedClient);
       user.setEmail("user@admin.com");
       user.setPassword(encryptPassword("admin"));
-      user.setRole("1234567890");
+      user.setRole(Role.ADMIN);
       user.setStatus(true);
       userRepository.save(user);
     }
