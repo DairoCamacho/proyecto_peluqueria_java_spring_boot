@@ -24,6 +24,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("api/client")
+// @PreAuthorize("hasRole('ADMIN')")
+// @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class ClientController {
 
   private final ClientRepository clientRepository;
