@@ -3,6 +3,6 @@ package com.unaux.dairo.api.domain.user;
 public record UserResponseDto(
   int id,
   String email,
-  boolean status,
-  Role role
+  Role role,
+  Boolean status
 ) {}

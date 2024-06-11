@@ -1,7 +1,7 @@
 package com.unaux.dairo.api.domain.user;
 
 public enum Role {
-  ADMIN,
+  CLIENT,
   EMPLOYEE,
-  CLIENT
+  ADMIN
 }

@@ -37,23 +37,24 @@ public class DataLoader implements CommandLineRunner {
     boolean existsEmail = userRepository.existsByEmail(email);
 
     if (!existsEmail) {
+      // Crear y guardar el usuario
+      User user = new User();
+      user.setEmail("user@admin.com");
+      user.setPassword(encryptPassword("admin"));
+      user.setRole(Role.ADMIN);
+      user.setStatus(true);
+      User userCreated = userRepository.save(user);
+
       // Crear y guardar el cliente
       Client client = new Client();
       client.setBirthday(LocalDate.of(1990, 5, 15));
       client.setLastName("User");
       client.setName("Admin");
       client.setPhone("3201110022");
-      client.setType("VIP");
-      Client savedClient = clientRepository.save(client);
-
-      // Crear y guardar el usuario
-      User user = new User();
-      user.setClient(savedClient);
-      user.setEmail("user@admin.com");
-      user.setPassword(encryptPassword("admin"));
-      user.setRole(Role.ADMIN);
-      user.setStatus(true);
-      userRepository.save(user);
+      client.setType("ADMIN");
+      client.setStatus(true);
+      client.setUser(userCreated);
+      clientRepository.save(client);
     }
   }
 

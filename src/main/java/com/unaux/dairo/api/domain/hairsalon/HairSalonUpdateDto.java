@@ -9,5 +9,6 @@ public record HairSalonUpdateDto(
   String address,
   String neighborhood,
   String city,
-  String country
+  String country,
+  Boolean status
 ) {}

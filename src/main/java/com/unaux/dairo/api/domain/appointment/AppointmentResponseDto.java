@@ -4,12 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record AppointmentResponseDto(
-  String id,
+  int id,
   LocalDate date,
   LocalTime time,
-  String status,
+  String condition,
   String notes,
-  int service,
+  int product,
   int employee,
-  int client
+  int client,
+  boolean status
 ) {}

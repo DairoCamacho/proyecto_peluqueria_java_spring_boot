@@ -1,23 +1,16 @@
 package com.unaux.dairo.api.controller;
 
-import com.unaux.dairo.api.domain.appointment.Appointment;
-import com.unaux.dairo.api.domain.appointment.AppointmentCreateDto;
-import com.unaux.dairo.api.domain.appointment.AppointmentFindDto;
-import com.unaux.dairo.api.domain.appointment.AppointmentResponseDto;
-import com.unaux.dairo.api.domain.appointment.AppointmentUpdateDto;
-import com.unaux.dairo.api.domain.client.Client;
-import com.unaux.dairo.api.domain.employee.Employee;
-import com.unaux.dairo.api.domain.service.Service;
-import com.unaux.dairo.api.repository.AppointmentRepository;
-import com.unaux.dairo.api.repository.ClientRepository;
-import com.unaux.dairo.api.repository.EmployeeRepository;
-import com.unaux.dairo.api.repository.ServiceRepository;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,147 +22,159 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.unaux.dairo.api.domain.appointment.Appointment;
+import com.unaux.dairo.api.domain.appointment.AppointmentCreateDto;
+import com.unaux.dairo.api.domain.appointment.AppointmentFindDto;
+import com.unaux.dairo.api.domain.appointment.AppointmentResponseDto;
+import com.unaux.dairo.api.domain.appointment.AppointmentUpdateDto;
+import com.unaux.dairo.api.infra.errors.ResourceNotFoundException;
+import com.unaux.dairo.api.service.AppointmentService;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("api/appointment")
+// @PreAuthorize("hasRole('ADMIN')")
+// @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class AppointmentController {
 
-  private final AppointmentRepository appointmentRepository;
-  private final ServiceRepository serviceRepository;
-  private final EmployeeRepository employeeRepository;
-  private final ClientRepository clientRepository;
+  private final AppointmentService appointmentService;
 
-  public AppointmentController(
-    AppointmentRepository appointmentRepository,
-    ServiceRepository serviceRepository,
-    EmployeeRepository employeeRepository,
-    ClientRepository clientRepository
-  ) {
-    this.appointmentRepository = appointmentRepository;
-    this.serviceRepository = serviceRepository;
-    this.employeeRepository = employeeRepository;
-    this.clientRepository = clientRepository;
+  public AppointmentController(AppointmentService appointmentService) {
+    this.appointmentService = appointmentService;
   }
 
   @PostMapping
-  public ResponseEntity<AppointmentResponseDto> createAppointment(
-    @RequestBody @Valid AppointmentCreateDto appointmentCreateDto,
-    UriComponentsBuilder uriComponentsBuilder
-  ) {
-    Service service = serviceRepository
-      .findById(appointmentCreateDto.service())
-      .orElseThrow(() -> new RuntimeException("Service not found"));
+  public ResponseEntity<?> createAppointment(UriComponentsBuilder uriComponentsBuilder,
+      @RequestBody @Valid AppointmentCreateDto appointmentCreateDto) {
+    // Extraemos los datos
+    LocalDate date = appointmentCreateDto.date();
+    LocalTime time = appointmentCreateDto.time();
+    int productId = appointmentCreateDto.productId();
+    int employeeId = appointmentCreateDto.employeeId();
+    int clientId = appointmentCreateDto.clientId();
+    String notes = appointmentCreateDto.notes();
 
-    Employee employee = employeeRepository
-      .findById(appointmentCreateDto.employee())
-      .orElseThrow(() -> new RuntimeException("Employee not found"));
+    // *** validaciones menores (tipo, formato, etc)
+    LocalDateTime dateTime = date.atTime(time);
+    if (dateTime.isBefore(LocalDateTime.now())) {
+      Map<String, Object> errorDetails = new HashMap<>();
+      errorDetails.put("code", "BAD_REQUEST");
+      errorDetails.put("message", "Error in the request");
+      errorDetails.put("details", "The date and time is earlier than the current date.");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
+    }
 
-    Client client = clientRepository
-      .findById(appointmentCreateDto.client())
-      .orElseThrow(() -> new RuntimeException("Client not found"));
+    try {
+      Appointment appointment = appointmentService.save(date, time, productId, employeeId, clientId, notes);
+      // creamos un DTO para retornar el objeto creado al frontend
+      AppointmentResponseDto response = mapAppointmentToResponseDto(appointment);
+      // Aquí crearemos una url que corresponde al objeto que se creó en la base de datos.
+      URI url = uriComponentsBuilder
+          .path("api/appointment/{id}")
+          .buildAndExpand(appointment.getId())
+          .toUri();
 
-    Appointment appointment = appointmentRepository.save(
-      new Appointment(appointmentCreateDto, service, employee, client)
-    );
+      return ResponseEntity.created(url).body(response);
 
-    AppointmentResponseDto response = new AppointmentResponseDto(
-      appointment.getId(),
-      appointment.getDate(),
-      appointment.getTime(),
-      appointment.getStatus(),
-      appointment.getNotes(),
-      appointment.getService().getId(),
-      appointment.getEmployee().getId(),
-      appointment.getClient().getId()
-    );
-    URI url = uriComponentsBuilder
-      .path("api/appointment/{id}")
-      .buildAndExpand(appointment.getId())
-      .toUri();
-
-    return ResponseEntity.created(url).body(response);
+    } catch (ResourceNotFoundException e) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST)
+          .header(e.getClass().getSimpleName(), e.getMessage())
+          .body(e.getMessage());
+    }
   }
 
   @GetMapping
-  public ResponseEntity<Page<AppointmentFindDto>> listAllAppointment(
-    Pageable pagination
-  ) {
-    return ResponseEntity.ok(
-      appointmentRepository.findAll(pagination).map(AppointmentFindDto::new)
-    );
+  public ResponseEntity<Page<AppointmentFindDto>> listAllAppointment(Pageable pagination) {
+    Page<Appointment> ListAppointments = appointmentService.findAll(pagination);
+    return ResponseEntity.ok(ListAppointments.map(AppointmentFindDto::new));
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<AppointmentResponseDto> findAppointment(
-    @PathVariable String id
-  ) {
-    Optional<Appointment> appointmentOptional = appointmentRepository.findById(
-      id
-    );
-    if (!appointmentOptional.isPresent()) {
-      return ResponseEntity.notFound().build();
-    }
-    Appointment appointment = appointmentOptional.get();
+  public ResponseEntity<?> findAppointment(@PathVariable int id) {
+    // *** No hay validaciones menores para realizar
+    Optional<Appointment> appointmentOptional = appointmentService.findById(id);
 
-    AppointmentResponseDto response = new AppointmentResponseDto(
-      appointment.getId(),
-      appointment.getDate(),
-      appointment.getTime(),
-      appointment.getStatus(),
-      appointment.getNotes(),
-      appointment.getService().getId(),
-      appointment.getEmployee().getId(),
-      appointment.getClient().getId()
-    );
+    if (!appointmentOptional.isPresent()) {
+      Map<String, Object> errorDetails = new HashMap<>();
+      errorDetails.put("code", "RESOURCE_NOT_FOUND");
+      errorDetails.put("message", "The requested resource was not found");
+      errorDetails.put("details", "No record with the ID " + id + " was found in the database.");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails);
+
+      // Enviar un código de estado HTTP 404 Not Found con un mensaje en el cuerpo
+      //! return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The requested client is not found");
+    }
+    // Creamos un DTO para retornar el objeto al frontend
+    Appointment appointment = appointmentOptional.get();
+    AppointmentResponseDto response = mapAppointmentToResponseDto(appointment);
 
     return ResponseEntity.ok(response);
   }
 
   @PutMapping
   @Transactional
-  public ResponseEntity<AppointmentResponseDto> updateAppointment(
-    @RequestBody @Valid AppointmentUpdateDto appointmentUpdateDto
-  ) {
-    Appointment appointment = appointmentRepository.getReferenceById(
-      appointmentUpdateDto.id()
-    );
-    Service service = serviceRepository.getReferenceById(
-      appointmentUpdateDto.service()
-    );
-    Employee employee = employeeRepository.getReferenceById(
-      appointmentUpdateDto.employee()
-    );
+  public ResponseEntity<?> updateAppointment(
+      @RequestBody @Valid AppointmentUpdateDto appointmentUpdateDto) {
+    // Extraemos los datos
+    int id = appointmentUpdateDto.id();
+    LocalDate date = appointmentUpdateDto.date();
+    LocalTime time = appointmentUpdateDto.time();
+    int productId = appointmentUpdateDto.productId();
+    int employeeId = appointmentUpdateDto.employeeId();
+    String notes = appointmentUpdateDto.notes();
 
-    /* 
-    // ! el cliente no se permitirá modificar
-    Client client = clientRepository.getReferenceById(
-      appointmentUpdateDto.client()
-    );
-     */
+    // *** validaciones menores (tipo, formato, etc)
+    LocalDateTime dateTime = date.atTime(time);
 
-    appointment.update(appointmentUpdateDto, service, employee);
+    if (dateTime.isBefore(LocalDateTime.now())) {
+      Map<String, Object> errorDetails = new HashMap<>();
+      errorDetails.put("code", "BAD_REQUEST");
+      errorDetails.put("message", "Error in the request");
+      errorDetails.put("details", "The date and time is earlier than the current date.");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
+    }
 
-    AppointmentResponseDto response = new AppointmentResponseDto(
-      appointment.getId(),
-      appointment.getDate(),
-      appointment.getTime(),
-      appointment.getStatus(),
-      appointment.getNotes(),
-      appointment.getService().getId(),
-      appointment.getEmployee().getId(),
-      appointment.getClient().getId()
-    );
+    try {
+      Appointment appointment = appointmentService.update(id, date, time, productId, employeeId, notes);
+      // Creamos un DTO para retornar el objeto al frontend
+      AppointmentResponseDto response = mapAppointmentToResponseDto(appointment);
 
-    return ResponseEntity.ok(response);
+      return ResponseEntity.ok(response);
+    } catch (EntityNotFoundException e) {
+      String errorMessage = String.format("Resource not found with ID: %d", id);
+      return ResponseEntity.badRequest().body(errorMessage);
+    } catch (ResourceNotFoundException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
   }
-  
-  // OJO: delete físico
+
   @DeleteMapping("/{id}")
   @Transactional
-  public void deleteAppointment(@PathVariable String id) {
-    Appointment appointment = appointmentRepository
-      .findById(id)
-      .orElseThrow(() -> new RuntimeException("Appointment not found"));
+  public ResponseEntity<?> deleteAppointment(@PathVariable int id) {
+    try {
+      appointmentService.delete(id);
+      // Retornamos una respuesta vacía
+      return ResponseEntity.noContent().build();
+    } catch (EntityNotFoundException e) {
+      String errorMessage = String.format("Resource not found with ID: %d", id);
+      return ResponseEntity.badRequest().body(errorMessage);
+    }
+  }
 
-    appointmentRepository.delete(appointment);
+  private AppointmentResponseDto mapAppointmentToResponseDto(Appointment appointment) {
+    return new AppointmentResponseDto(
+        appointment.getId(),
+        appointment.getDateAppointment(),
+        appointment.getTimeAppointment(),
+        appointment.getConditionAppointment(),
+        appointment.getNotes(),
+        appointment.getProduct().getId(),
+        appointment.getEmployee().getId(),
+        appointment.getClient().getId(),
+        appointment.isStatus());
   }
 }
