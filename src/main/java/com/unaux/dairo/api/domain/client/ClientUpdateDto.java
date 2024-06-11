@@ -1,16 +1,13 @@
 package com.unaux.dairo.api.domain.client;
 
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.NotNull;
 
 public record ClientUpdateDto(
   @NotNull int id,
-  String birthday,
-  String confirmPassword,
-  String email,
+  LocalDate birthday,
   String lastName,
   String name,
-  String newPassword,
-  String password,
-  String phone,
-  String type
+  String phone
 ) {}

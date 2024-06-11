@@ -8,9 +8,9 @@ public record ClientFindDto(
   String lastName,
   String name,
   String phone,
+  boolean status,
   String type,
-  String email,
-  boolean status
+  int userId
 ) {
   public ClientFindDto(Client client) {
     this(
@@ -19,9 +19,9 @@ public record ClientFindDto(
       client.getLastName(),
       client.getName(),
       client.getPhone(),
+      client.isStatus(),
       client.getType(),
-      client.getUser().getEmail(),
-      client.getUser().isStatus()
+      client.getUser().getId()
     );
   }
 }

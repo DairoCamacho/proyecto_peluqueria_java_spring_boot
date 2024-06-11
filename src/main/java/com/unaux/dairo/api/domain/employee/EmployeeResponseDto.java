@@ -13,5 +13,6 @@ public record EmployeeResponseDto(
   String position,
   LocalDate hireDate,
   LocalDate terminationDate,
-  int hairSalonId
+  int hairSalonId,
+  boolean status
 ) {}

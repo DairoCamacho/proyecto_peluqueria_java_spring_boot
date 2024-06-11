@@ -4,23 +4,23 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record AppointmentFindDto(
-  String id,
+  int id,
   LocalDate date,
   LocalTime time,
-  String status,
+  String condition,
   String notes,
-  int service,
+  int product,
   int employee,
   int client
 ) {
   public AppointmentFindDto(Appointment appointment){
     this(
       appointment.getId(),
-      appointment.getDate(),
-      appointment.getTime(),
-      appointment.getStatus(),
+      appointment.getDateAppointment(),
+      appointment.getTimeAppointment(),
+      appointment.getConditionAppointment(),
       appointment.getNotes(),
-      appointment.getService().getId(),
+      appointment.getProduct().getId(),
       appointment.getEmployee().getId(),
       appointment.getClient().getId()
     );

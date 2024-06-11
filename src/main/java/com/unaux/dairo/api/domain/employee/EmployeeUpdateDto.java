@@ -5,8 +5,9 @@ import java.time.LocalDate;
 
 public record EmployeeUpdateDto(
   @NotNull int id,
-  String position,
   LocalDate hireDate,
+  String position,
+  Boolean status,
   LocalDate terminationDate,
   int hairSalonId
 ) {}

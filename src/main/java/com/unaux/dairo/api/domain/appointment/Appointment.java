@@ -1,8 +1,16 @@
 package com.unaux.dairo.api.domain.appointment;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import org.hibernate.Hibernate;
+
+// import org.hibernate.annotations.GenericGenerator;
+
 import com.unaux.dairo.api.domain.client.Client;
 import com.unaux.dairo.api.domain.employee.Employee;
-import com.unaux.dairo.api.domain.service.Service;
+import com.unaux.dairo.api.domain.product.Product;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,104 +19,106 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.annotations.GenericGenerator;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "appointment")
 public class Appointment {
 
   @Id
-  @GeneratedValue(
-    strategy = GenerationType.SEQUENCE,
-    generator = "appointmentIdGenerator"
-  ) // Cambiado a SEQUENCE
-  @GenericGenerator(
-    name = "appointmentIdGenerator",
-    strategy = "com.unaux.dairo.api.domain.appointment.AppointmentIdGenerator"
-  )
-  private String id;
+  // @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "appointmentIdGenerator")
+  // @GenericGenerator(name = "appointmentIdGenerator",strategy = "com.unaux.dairo.api.domain.appointment.AppointmentIdGenerator")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private int id;
 
-  @Column(name = "date", nullable = false)
-  private LocalDate date;
+  @Column(name = "date_appointment", nullable = false)
+  private LocalDate dateAppointment;
 
-  @Column(name = "time", nullable = false)
-  private LocalTime time;
+  @Column(name = "time_appointment", nullable = false)
+  private LocalTime timeAppointment;
 
-  @Column(name = "status", nullable = false, length = 45)
-  private String status;
+  @Column(name = "condition_appointment", nullable = false, length = 45)
+  private String conditionAppointment;
 
   @Column(name = "notes", length = 45)
   private String notes;
 
-  @ManyToOne
-  @JoinColumn(
-    name = "service_id",
-    referencedColumnName = "id",
-    nullable = false
-  )
-  private Service service;
+  @Column(name = "status", nullable = false)
+  private boolean status;
 
   @ManyToOne
-  @JoinColumn(
-    name = "employee_id",
-    referencedColumnName = "id",
-    nullable = false
-  )
+  @JoinColumn(name = "product_id", referencedColumnName = "id", nullable = false)
+  private Product product;
+
+  @ManyToOne
+  @JoinColumn(name = "employee_id", referencedColumnName = "id", nullable = false)
   private Employee employee;
 
   @ManyToOne
   @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
   private Client client;
 
-  public Appointment(
-    AppointmentCreateDto appointmentCreateDto,
-    Service service,
-    Employee employee,
-    Client client
-  ) {
-    this.date = appointmentCreateDto.date();
-    this.time = appointmentCreateDto.time();
-    this.status = "pending";
-    this.notes = appointmentCreateDto.notes();
-    this.service = service;
-    this.employee = employee;
-    this.client = client;
+  public Appointment(LocalDate date2, LocalTime time2, Product product2, Employee employee2, Client client2,
+      String notes2) {
+    setDateAppointment(date2);
+    setTimeAppointment(time2);
+    setProduct(product2);
+    setEmployee(employee2);
+    setClient(client2);
+    setNotes(notes2);
+    setStatus(true);
+    setConditionAppointment("pending");
   }
 
-  public void update(
-    AppointmentUpdateDto appointmentUpdateDto,
-    Service service,
-    Employee employee
-  ) {
-    if (appointmentUpdateDto.date() != null) {
-      setDate(appointmentUpdateDto.date());
+  public void update(LocalDate date3, LocalTime time3, Product product3, Employee employee3, String notes3) {
+    if (date3 != null) {
+      setDateAppointment(date3);
     }
-    if (appointmentUpdateDto.time() != null) {
-      setTime(appointmentUpdateDto.time());
+    if (time3 != null) {
+      setTimeAppointment(time3);
     }
-    if (appointmentUpdateDto.status() != null) {
-      setStatus(appointmentUpdateDto.status());
+    if (product3.getId() > 0) {
+      setProduct(product3);
     }
-    if (appointmentUpdateDto.notes() != null) {
-      setNotes(appointmentUpdateDto.notes());
+    if (employee3.getId() > 0) {
+      setEmployee(employee3);
     }
-    if (service.getId() > 0) {
-      setService(service);
-    }
-    if (employee.getId() > 0) {
-      setEmployee(employee);
+    if (notes3 != null) {
+      setNotes(notes3);
     }
   }
+
+  public void inactivate() {
+    setStatus(false);
+  }
+
+  @Override
+  public String toString() {
+    if (Hibernate.isInitialized(this)) {
+      return "Appointment [id=" + id + ", dateAppointment=" + dateAppointment + ", timeAppointment=" + timeAppointment
+          + ", conditionAppointment=" + conditionAppointment + ", notes=" + notes + ", status=" + status + "]";
+    } else {
+      return "Appointment (Proxy)";
+    }
+  }
+  /*
+   Hibernate utiliza proxies para cargar entidades de forma perezosa. Esto significa que recupera datos de la base de datos solo cuando es necesario, lo que mejora el rendimiento.
+  Cuando llamas a toString() en un objeto proxy, Hibernate intenta acceder a sus datos subyacentes, que podrían no estar cargados todavía.
+  Esto desencadena una cadena de llamadas donde cada objeto intenta convertirse a una cadena, lo que resulta en un bucle infinito.
+  
+  Personalizar toString() para proxies:
+  Si solo necesitas información específica del cliente para el registro, considera anular el método toString() en tu clase Client. 
+  Este método puede verificar si el objeto es un proxy y devolver la información deseada directamente, evitando el bucle infinito.
+   */
 }

@@ -1,9 +1,15 @@
 package com.unaux.dairo.api.domain.employee;
 
+import java.time.LocalDate;
+import java.util.Set;
+
+import org.hibernate.Hibernate;
+
 import com.unaux.dairo.api.domain.appointment.Appointment;
 import com.unaux.dairo.api.domain.client.Client;
 import com.unaux.dairo.api.domain.hairsalon.HairSalon;
 import com.unaux.dairo.api.domain.workinghours.WorkingHours;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,18 +20,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
-import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @EqualsAndHashCode
 @Entity
 @Table
@@ -48,6 +54,9 @@ public class Employee {
   @Column(name = "termination_date", nullable = true)
   private LocalDate terminationDate;
 
+  @Column(name = "status", nullable = false)
+  private boolean status;
+
   @ManyToOne
   @JoinColumn(name = "hair_salon_id", referencedColumnName = "id")
   private HairSalon hairSalon;
@@ -58,29 +67,43 @@ public class Employee {
   @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
   private Set<Appointment> appointments;
 
-  public Employee(
-    EmployeeCreateDto employeeCreateDto,
-    Client client,
-    HairSalon hairSalon
-  ) {
-    this.client = client;
-    this.position = employeeCreateDto.position();
-    this.hireDate = employeeCreateDto.hireDate();
-    this.hairSalon = hairSalon;
+  public Employee(Client client2, String position2, LocalDate hireDate2, HairSalon hairSalon2) {
+    setClient(client2);
+    setPosition(position2);
+    setHireDate(hireDate2);
+    setHairSalon(hairSalon2);
+    setStatus(true);
   }
 
-  public void update(EmployeeUpdateDto employeeUpdateDto, HairSalon hairSalon) {
-    if (employeeUpdateDto.position() != null) {
-      setPosition(employeeUpdateDto.position());
+  public void update(String position3, LocalDate hireDate3, LocalDate terminationDate3, Boolean status3,
+      HairSalon hairSalon3) {
+    if (position3 != null) {
+      setPosition(position3);
     }
-    if (employeeUpdateDto.hireDate() != null) {
-      setHireDate(employeeUpdateDto.hireDate());
+    if (hireDate3 != null) {
+      setHireDate(hireDate3);
     }
-    if (employeeUpdateDto.terminationDate() != null) {
-      setTerminationDate(employeeUpdateDto.terminationDate());
+    if (terminationDate3 != null) {
+      setTerminationDate(terminationDate3);
     }
-    if (employeeUpdateDto.hairSalonId() > 0) {
-      setHairSalon(hairSalon);
+    if (status3 != null) {
+      setStatus(status3);
+    }
+    // por defecto siempre viene un HairSalon desde el Servicio, sea el mismo que ya tiene o uno nuevo para actualizar
+    setHairSalon(hairSalon3);
+  }
+
+  public void inactivate() {
+    setStatus(false);
+  }
+
+  @Override
+  public String toString() {
+    if (Hibernate.isInitialized(this)) {
+      return "Employee [id=" + id + ", client=" + client + ", position=" + position + ", hireDate=" + hireDate
+          + ", terminationDate=" + terminationDate + ", status=" + status + "]";
+    } else {
+      return "Appointment (Proxy)";
     }
   }
 }
