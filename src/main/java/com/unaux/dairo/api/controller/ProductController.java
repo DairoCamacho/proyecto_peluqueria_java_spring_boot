@@ -83,7 +83,7 @@ public class ProductController {
     // *** No hay validaciones menores para realizar
     Optional<Product> productOptional = productService.findById(id);
 
-    if (!productOptional.isPresent()) {
+    if (productOptional.isEmpty()) {
       Map<String, Object> errorDetails = new HashMap<>();
       errorDetails.put("code", "RESOURCE_NOT_FOUND");
       errorDetails.put("message", "The requested resource was not found");
@@ -118,7 +118,7 @@ public class ProductController {
 
       return ResponseEntity.ok(response);
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", productUpdateDto.id());
+      String errorMessage = "Resource not found with ID: %d".formatted(productUpdateDto.id());
       return ResponseEntity.badRequest().body(errorMessage);
     } catch (ResourceNotFoundException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
@@ -133,7 +133,7 @@ public class ProductController {
       // Retornamos una respuesta vacía
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", id);
+      String errorMessage = "Resource not found with ID: %d".formatted(id);
       return ResponseEntity.badRequest().body(errorMessage);
     }
   }

@@ -41,6 +41,7 @@ import jakarta.validation.Valid;
 public class AppointmentController {
 
   private final AppointmentService appointmentService;
+  public static final String APPOINTMENT_BASE_URL = "/api/appointment/{id}";
 
   public AppointmentController(AppointmentService appointmentService) {
     this.appointmentService = appointmentService;
@@ -49,13 +50,13 @@ public class AppointmentController {
   @PostMapping
   public ResponseEntity<?> createAppointment(UriComponentsBuilder uriComponentsBuilder,
       @RequestBody @Valid AppointmentCreateDto appointmentCreateDto) {
-    // Extraemos los datos
+    // Extraemos los datos del DTO
     LocalDate date = appointmentCreateDto.date();
     LocalTime time = appointmentCreateDto.time();
+    String notes = appointmentCreateDto.notes();
     int productId = appointmentCreateDto.productId();
     int employeeId = appointmentCreateDto.employeeId();
     int clientId = appointmentCreateDto.clientId();
-    String notes = appointmentCreateDto.notes();
 
     // *** validaciones menores (tipo, formato, etc)
     LocalDateTime dateTime = date.atTime(time);
@@ -68,16 +69,18 @@ public class AppointmentController {
     }
 
     try {
-      Appointment appointment = appointmentService.save(date, time, productId, employeeId, clientId, notes);
+      Appointment appointment = appointmentService.save(date, time, notes, productId, employeeId, clientId);
       // creamos un DTO para retornar el objeto creado al frontend
       AppointmentResponseDto response = mapAppointmentToResponseDto(appointment);
       // Aquí crearemos una url que corresponde al objeto que se creó en la base de datos.
-      URI url = uriComponentsBuilder
-          .path("api/appointment/{id}")
-          .buildAndExpand(appointment.getId())
-          .toUri();
+      String url = APPOINTMENT_BASE_URL.replace("{id}", String.valueOf(appointment.getId()));
+      URI uri = uriComponentsBuilder.path(url).buildAndExpand(appointment.getId()).toUri();
+      // URI url = uriComponentsBuilder
+      //     .path(APPOINTMENT_BASE_URL)
+      //     .buildAndExpand(appointment.getId())
+      //     .toUri();
 
-      return ResponseEntity.created(url).body(response);
+      return ResponseEntity.created(uri).body(response);
 
     } catch (ResourceNotFoundException e) {
       return ResponseEntity
@@ -98,7 +101,7 @@ public class AppointmentController {
     // *** No hay validaciones menores para realizar
     Optional<Appointment> appointmentOptional = appointmentService.findById(id);
 
-    if (!appointmentOptional.isPresent()) {
+    if (appointmentOptional.isEmpty()) {
       Map<String, Object> errorDetails = new HashMap<>();
       errorDetails.put("code", "RESOURCE_NOT_FOUND");
       errorDetails.put("message", "The requested resource was not found");
@@ -139,13 +142,14 @@ public class AppointmentController {
     }
 
     try {
-      Appointment appointment = appointmentService.update(id, date, time, productId, employeeId, notes);
+      Appointment appointment = appointmentService.update(
+        id, date, time, productId, employeeId, notes);
       // Creamos un DTO para retornar el objeto al frontend
       AppointmentResponseDto response = mapAppointmentToResponseDto(appointment);
 
       return ResponseEntity.ok(response);
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", id);
+      String errorMessage = "Resource not found with ID: %d".formatted(id);
       return ResponseEntity.badRequest().body(errorMessage);
     } catch (ResourceNotFoundException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
@@ -160,7 +164,7 @@ public class AppointmentController {
       // Retornamos una respuesta vacía
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", id);
+      String errorMessage = "Resource not found with ID: %d".formatted(id);
       return ResponseEntity.badRequest().body(errorMessage);
     }
   }
@@ -168,9 +172,9 @@ public class AppointmentController {
   private AppointmentResponseDto mapAppointmentToResponseDto(Appointment appointment) {
     return new AppointmentResponseDto(
         appointment.getId(),
-        appointment.getDateAppointment(),
-        appointment.getTimeAppointment(),
-        appointment.getConditionAppointment(),
+        appointment.getDate(),
+        appointment.getTime(),
+        appointment.getCondition(),
         appointment.getNotes(),
         appointment.getProduct().getId(),
         appointment.getEmployee().getId(),

@@ -82,7 +82,7 @@ public class WorkingHoursController {
     // *** No hay validaciones menores para realizar
     Optional<WorkingHours> workingHoursOptional = workingHoursService.findById(id);
 
-    if (!workingHoursOptional.isPresent()) {
+    if (workingHoursOptional.isEmpty()) {
 
       Map<String, Object> errorDetails = new HashMap<>();
       errorDetails.put("code", "RESOURCE_NOT_FOUND");
@@ -115,7 +115,7 @@ public class WorkingHoursController {
 
       return ResponseEntity.ok(response);
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", id);
+      String errorMessage = "Resource not found with ID: %d".formatted(id);
       return ResponseEntity.badRequest().body(errorMessage);
     }
   }
@@ -128,7 +128,7 @@ public class WorkingHoursController {
       // Retornamos una respuesta vacía
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", id);
+      String errorMessage = "Resource not found with ID: %d".formatted(id);
       return ResponseEntity.badRequest().body(errorMessage);
     }
   }

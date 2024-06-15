@@ -16,9 +16,9 @@ public record AppointmentFindDto(
   public AppointmentFindDto(Appointment appointment){
     this(
       appointment.getId(),
-      appointment.getDateAppointment(),
-      appointment.getTimeAppointment(),
-      appointment.getConditionAppointment(),
+      appointment.getDate(),
+      appointment.getTime(),
+      appointment.getCondition(),
       appointment.getNotes(),
       appointment.getProduct().getId(),
       appointment.getEmployee().getId(),

@@ -92,7 +92,7 @@ public class ClientController {
     // *** No hay validaciones menores para realizar
     Optional<Client> clientOptional = clientService.findById(id);
 
-    if (!clientOptional.isPresent()) {
+    if (clientOptional.isEmpty()) {
 
       Map<String, Object> errorDetails = new HashMap<>();
       errorDetails.put("code", "RESOURCE_NOT_FOUND");
@@ -131,7 +131,7 @@ public class ClientController {
 
       return ResponseEntity.ok(response);
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", clientUpdateDto.id());
+      String errorMessage = "Resource not found with ID: %d".formatted(clientUpdateDto.id());
       return ResponseEntity.badRequest().body(errorMessage);
     }
   }
@@ -144,7 +144,7 @@ public class ClientController {
       // Retornamos una respuesta vacía
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", id);
+      String errorMessage = "Resource not found with ID: %d".formatted(id);
       return ResponseEntity.badRequest().body(errorMessage);
     }
   }

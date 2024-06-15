@@ -84,7 +84,7 @@ public class HairSalonController {
     // *** No hay validaciones menores para realizar
     Optional<HairSalon> hairSalonOptional = hairSalonService.findById(id);
 
-    if (!hairSalonOptional.isPresent()) {
+    if (hairSalonOptional.isEmpty()) {
 
       Map<String, Object> errorDetails = new HashMap<>();
       errorDetails.put("code", "RESOURCE_NOT_FOUND");
@@ -123,7 +123,7 @@ public class HairSalonController {
 
       return ResponseEntity.ok(response);
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", hairSalonUpdateDto.id());
+      String errorMessage = "Resource not found with ID: %d".formatted(hairSalonUpdateDto.id());
       return ResponseEntity.badRequest().body(errorMessage);
     }
   }
@@ -136,7 +136,7 @@ public class HairSalonController {
       // Retornamos una respuesta vacía
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", id);
+      String errorMessage = "Resource not found with ID: %d".formatted(id);
       return ResponseEntity.badRequest().body(errorMessage);
     }
   }
