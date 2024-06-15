@@ -33,9 +33,8 @@ public class AppointmentService {
     this.clientService = clientService;
   }
 
-  public Appointment save(LocalDate date, LocalTime time, int productId, int employeeId, int clientId, String notes) {
-
-    // producto
+  public Appointment save(LocalDate date, LocalTime time, String notes, int productId, int employeeId, int clientId) {
+    
     Product product = productService.findById(productId)
         .orElseThrow(
             () -> new ResourceNotFoundException("Service not found with the ID: " + productId));
@@ -76,20 +75,15 @@ public class AppointmentService {
     // Actualizamos la Entidad con los datos del DTO
     appointment.update(date, time, product, employee, notes);
     // retornamos la Entidad ya actualizada
-    return appointment;
+    return appointmentRepository.save(appointment);
   }
 
   public void delete(int id) {
     // con el ID Buscamos la Entidad para eliminar
     Appointment appointment = appointmentRepository.getReferenceById(id);
     // cambiamos el campo condition, poniendo canceled
-    appointment.setConditionAppointment("canceled");
+    appointment.setCondition("canceled");
     // Desactivamos - borrado lógico
     appointment.inactivate();
   }
-
-  public void physicalDelete() {
-
-  }
-
 }

@@ -81,5 +81,4 @@ public class WorkingHours {
       return "Appointment (Proxy)";
     }
   }
-
 }

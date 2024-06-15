@@ -98,7 +98,7 @@ public class UserController {
   public ResponseEntity<?> findUser(@PathVariable int id) {
     // *** No hay validaciones menores para realizar
     Optional<User> userOptional = userService.findById(id);
-    if (!userOptional.isPresent()) {
+    if (userOptional.isEmpty()) {
 
       Map<String, Object> errorDetails = new HashMap<>();
       errorDetails.put("code", "RESOURCE_NOT_FOUND");
@@ -143,7 +143,7 @@ public class UserController {
 
       return ResponseEntity.ok(response);
     } catch (ResourceNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", id);
+      String errorMessage = "Resource not found with ID: %d".formatted(id);
       return ResponseEntity.badRequest().body(errorMessage);
     } catch (EmailAlreadyExistsException | PasswordsDoNotMatchException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
@@ -182,7 +182,7 @@ public class UserController {
       userService.delete(id);
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
-      String errorMessage = String.format("Resource not found with ID: %d", id);
+      String errorMessage = "Resource not found with ID: %d".formatted(id);
       return ResponseEntity.badRequest().body(errorMessage);
     }
   }

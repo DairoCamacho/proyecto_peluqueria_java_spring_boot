@@ -42,14 +42,14 @@ public class Appointment {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
-  @Column(name = "date_appointment", nullable = false)
-  private LocalDate dateAppointment;
+  @Column(name = "date", nullable = false)
+  private LocalDate date;
 
-  @Column(name = "time_appointment", nullable = false)
-  private LocalTime timeAppointment;
+  @Column(name = "time", nullable = false)
+  private LocalTime time;
 
-  @Column(name = "condition_appointment", nullable = false, length = 45)
-  private String conditionAppointment;
+  @Column(name = "condition", nullable = false, length = 45)
+  private String condition;
 
   @Column(name = "notes", length = 45)
   private String notes;
@@ -71,22 +71,22 @@ public class Appointment {
 
   public Appointment(LocalDate date2, LocalTime time2, Product product2, Employee employee2, Client client2,
       String notes2) {
-    setDateAppointment(date2);
-    setTimeAppointment(time2);
+    setDate(date2);
+    setTime(time2);
     setProduct(product2);
     setEmployee(employee2);
     setClient(client2);
     setNotes(notes2);
     setStatus(true);
-    setConditionAppointment("pending");
+    setCondition("pending");
   }
 
   public void update(LocalDate date3, LocalTime time3, Product product3, Employee employee3, String notes3) {
     if (date3 != null) {
-      setDateAppointment(date3);
+      setDate(date3);
     }
     if (time3 != null) {
-      setTimeAppointment(time3);
+      setTime(time3);
     }
     if (product3.getId() > 0) {
       setProduct(product3);
@@ -106,8 +106,8 @@ public class Appointment {
   @Override
   public String toString() {
     if (Hibernate.isInitialized(this)) {
-      return "Appointment [id=" + id + ", dateAppointment=" + dateAppointment + ", timeAppointment=" + timeAppointment
-          + ", conditionAppointment=" + conditionAppointment + ", notes=" + notes + ", status=" + status + "]";
+      return "Appointment [id=" + id + ", dateAppointment=" + date + ", timeAppointment=" + time
+          + ", conditionAppointment=" + condition + ", notes=" + notes + ", status=" + status + "]";
     } else {
       return "Appointment (Proxy)";
     }

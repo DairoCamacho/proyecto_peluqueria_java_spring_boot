@@ -12,8 +12,8 @@ public class AppointmentIdGenerator implements IdentifierGenerator {
 
     String employee = String.valueOf(appointment.getEmployee().getId());
     String client = String.valueOf(appointment.getClient().getId());
-    String date = appointment.getDateAppointment().toString();
-    String time = appointment.getTimeAppointment().toString();
+    String date = appointment.getDate().toString();
+    String time = appointment.getTime().toString();
 
     String id = employee + "--" + client + "--" +date + "--" + time;
 
