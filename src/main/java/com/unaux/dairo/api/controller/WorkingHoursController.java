@@ -25,6 +25,7 @@ import com.unaux.dairo.api.domain.workinghours.WorkingHoursCreateDto;
 import com.unaux.dairo.api.domain.workinghours.WorkingHoursFindDto;
 import com.unaux.dairo.api.domain.workinghours.WorkingHoursResponseDto;
 import com.unaux.dairo.api.domain.workinghours.WorkingHoursUpdateDto;
+import com.unaux.dairo.api.infra.errors.DuplicateWorkingHoursException;
 import com.unaux.dairo.api.infra.errors.ResourceNotFoundException;
 import com.unaux.dairo.api.service.WorkingHoursService;
 
@@ -63,7 +64,7 @@ public class WorkingHoursController {
           .toUri();
 
       return ResponseEntity.created(url).body(response);
-    } catch (ResourceNotFoundException e) {
+    } catch (ResourceNotFoundException | DuplicateWorkingHoursException e) {
       return ResponseEntity
           .status(HttpStatus.BAD_REQUEST)
           .header(e.getClass().getSimpleName(), e.getMessage())

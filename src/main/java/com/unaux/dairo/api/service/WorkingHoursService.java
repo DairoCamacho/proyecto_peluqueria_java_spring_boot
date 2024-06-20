@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.unaux.dairo.api.domain.employee.Employee;
 import com.unaux.dairo.api.domain.workinghours.WorkingHours;
+import com.unaux.dairo.api.infra.errors.DuplicateWorkingHoursException;
 import com.unaux.dairo.api.infra.errors.ResourceNotFoundException;
 import com.unaux.dairo.api.repository.EmployeeRepository;
 import com.unaux.dairo.api.repository.WorkingHoursRepository;
@@ -25,12 +26,18 @@ public class WorkingHoursService {
   }
 
   public WorkingHours save(LocalDateTime startDate, LocalDateTime endDate, int employeeId) {
-
+    // Verificar si existe el empleado existe
     Employee employee = employeeService.findById(employeeId)
         .orElseThrow(
             () -> new ResourceNotFoundException(
                 "Employee not found with the ID: " + employeeId));
 
+    // Verificar si existe un registro duplicado o superpuesto
+    boolean existsDuplicate = workingHoursRepository.existsByEmployeeIdAndOverlappingDate(employee.getId(), startDate, endDate);
+    if (existsDuplicate){
+      throw new DuplicateWorkingHoursException("Working hours already exist for employee: " + employeeId + ", start date: " + startDate + ", end date: " + endDate);
+    }
+    // Guardar el nuevo registro
     return workingHoursRepository.save(new WorkingHours(startDate, endDate, employee));
   }
 
