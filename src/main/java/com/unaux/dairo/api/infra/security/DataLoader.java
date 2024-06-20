@@ -1,60 +1,249 @@
 package com.unaux.dairo.api.infra.security;
 
-import com.unaux.dairo.api.domain.client.Client;
-import com.unaux.dairo.api.domain.user.Role;
-import com.unaux.dairo.api.domain.user.User;
-import com.unaux.dairo.api.repository.ClientRepository;
-import com.unaux.dairo.api.repository.UserRepository;
-
-import jakarta.transaction.Transactional;
-
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import com.unaux.dairo.api.domain.appointment.Appointment;
+import com.unaux.dairo.api.domain.client.Client;
+import com.unaux.dairo.api.domain.employee.Employee;
+import com.unaux.dairo.api.domain.hairsalon.HairSalon;
+import com.unaux.dairo.api.domain.product.Product;
+import com.unaux.dairo.api.domain.user.Role;
+import com.unaux.dairo.api.domain.user.User;
+import com.unaux.dairo.api.domain.workinghours.WorkingHours;
+import com.unaux.dairo.api.repository.AppointmentRepository;
+import com.unaux.dairo.api.repository.ClientRepository;
+import com.unaux.dairo.api.repository.EmployeeRepository;
+import com.unaux.dairo.api.repository.HairSalonRepository;
+import com.unaux.dairo.api.repository.ProductRepository;
+import com.unaux.dairo.api.repository.UserRepository;
+import com.unaux.dairo.api.repository.WorkingHoursRepository;
+
+import jakarta.transaction.Transactional;
 
 @Component
 public class DataLoader implements CommandLineRunner {
 
   private final ClientRepository clientRepository;
-
   private final UserRepository userRepository;
+  private final HairSalonRepository hairSalonRepository;
+  private final EmployeeRepository employeeRepository;
+  private final ProductRepository productRepository;
+  private final AppointmentRepository appointmentRepository;
+  private final WorkingHoursRepository workingHoursRepository;
 
   // inyectamos los repositorios
-  public DataLoader(
-    ClientRepository clientRepository,
-    UserRepository userRepository
-  ) {
+  public DataLoader(ClientRepository clientRepository, UserRepository userRepository,
+      HairSalonRepository hairSalonRepository, EmployeeRepository employeeRepository,
+      ProductRepository productRepository, AppointmentRepository appointmentRepository,
+      WorkingHoursRepository workingHoursRepository) {
     this.clientRepository = clientRepository;
     this.userRepository = userRepository;
+    this.hairSalonRepository = hairSalonRepository;
+    this.employeeRepository = employeeRepository;
+    this.productRepository = productRepository;
+    this.appointmentRepository = appointmentRepository;
+    this.workingHoursRepository = workingHoursRepository;
   }
 
   @Override
-  @Transactional
+  // @Transactional
   public void run(String... args) throws Exception {
     // Verificar si el usuario existe
-    String email = "user@admin.com";
-    boolean existsEmail = userRepository.existsByEmail(email);
+    String email1 = "user@admin.com";
+    if (!userRepository.existsByEmail(email1)) {
+      // Crear y guardar usuarios
+      User user1 = User.builder().email(email1).password(encryptPassword("admin")).role(Role.ADMIN).status(true)
+          .build();
+      User userCreated1 = userRepository.save(user1);
 
-    if (!existsEmail) {
-      // Crear y guardar el usuario
-      User user = new User();
-      user.setEmail("user@admin.com");
-      user.setPassword(encryptPassword("admin"));
-      user.setRole(Role.ADMIN);
-      user.setStatus(true);
-      User userCreated = userRepository.save(user);
+      Client client1 = Client.builder().birthday(LocalDate.of(1990, 1, 1)).lastName("Admin").name("User")
+          .phone("3201111111").type("ADMIN").status(true).user(userCreated1).build();
 
-      // Crear y guardar el cliente
-      Client client = new Client();
-      client.setBirthday(LocalDate.of(1990, 5, 15));
-      client.setLastName("User");
-      client.setName("Admin");
-      client.setPhone("3201110022");
-      client.setType("ADMIN");
-      client.setStatus(true);
-      client.setUser(userCreated);
-      clientRepository.save(client);
+      clientRepository.save(client1);
+    }
+
+    // Verificar si el usuario existe
+    String email2 = "aleja@empleada.com";
+    if (!userRepository.existsByEmail(email2)) {
+      // Crear y guardar usuarios
+      User user2 = User.builder().email(email2).password(encryptPassword("admin")).role(Role.EMPLOYEE).status(true)
+          .build();
+      User userCreated2 = userRepository.save(user2);
+
+      Client client2 = Client.builder().birthday(LocalDate.of(1990, 1, 2)).lastName("Alejandra").name("Alejandra")
+          .phone("3201111112").type("EMPLOYEE").status(true).user(userCreated2).build();
+
+      clientRepository.save(client2);
+    }
+
+    // Verificar si el usuario existe
+    String email3 = "maria@empleada.com";
+    if (!userRepository.existsByEmail(email3)) {
+      // Crear y guardar usuarios
+      User user3 = User.builder().email(email3).password(encryptPassword("admin")).role(Role.EMPLOYEE).status(true)
+          .build();
+      User userCreated3 = userRepository.save(user3);
+
+      Client client3 = Client.builder().birthday(LocalDate.of(1990, 1, 3)).lastName("Maria").name("Maria")
+          .phone("3201111113").type("EMPLOYEE").status(true).user(userCreated3).build();
+
+      clientRepository.save(client3);
+    }
+
+    // Verificar si el usuario existe
+    String email4 = "pedro@cliente.com";
+    if (!userRepository.existsByEmail(email4)) {
+      // Crear y guardar usuarios
+      User user4 = User.builder().email(email4).password(encryptPassword("admin")).role(Role.CLIENT).status(true)
+          .build();
+      User userCreated4 = userRepository.save(user4);
+
+      Client client4 = Client.builder().birthday(LocalDate.of(1990, 1, 4)).lastName("Perez").name("Pedro")
+          .phone("3201111114").type("new client").status(true).user(userCreated4).build();
+
+      clientRepository.save(client4);
+    }
+
+    // Verificar si peluquería existe
+    String hairSalonName = "Peluquería de Prueba";
+    if (!hairSalonRepository.existsByName(hairSalonName)) {
+      HairSalon hairSalon = HairSalon.builder().name(hairSalonName).phone("tel9997890").address("Calle 123, 12345")
+          .neighborhood("Centro").city("Manizales").country("Colombia").status(true).build();
+
+      hairSalonRepository.save(hairSalon);
+    }
+
+    // Verificar si empleado existe
+    int employee1 = 1;
+    if (!employeeRepository.existsById(employee1)) {
+      Employee employee = Employee.builder()
+          .client(clientRepository.getReferenceById(2)) // Alejandra
+          .hairSalon(hairSalonRepository.getReferenceById(1))
+          .hireDate(LocalDate.of(2024,04,01))
+          .position("Peluquero")
+          .status(true)
+          .build();
+      employeeRepository.save(employee);
+    }
+    // Verificar si empleado existe
+    int employee2 = 2;
+    if (!employeeRepository.existsById(employee2)) {
+      Employee employee = Employee.builder()
+          .client(clientRepository.getReferenceById(3)) // Maria
+          .hairSalon(hairSalonRepository.getReferenceById(1))
+          .hireDate(LocalDate.of(2024,04,02))
+          .position("Manicurista")
+          .status(true)
+          .build();
+      employeeRepository.save(employee);
+    }
+
+    // Verificar si workingHour existe
+    int workingHour1 = 1;
+    if(!workingHoursRepository.existsById(workingHour1)){
+      WorkingHours workingHours = WorkingHours.builder()
+      .startDate(LocalDateTime.of(2024,8,01,8,00))
+      .endDate(LocalDateTime.of(2024,8,01,14,00))
+      .employee(employeeRepository.getReferenceById(1)) // Alejandra
+      .status(true)
+      .build();
+
+      workingHoursRepository.save(workingHours);
+    }
+
+    // Verificar si workingHour existe
+    int workingHour2 = 2;
+    if(!workingHoursRepository.existsById(workingHour2)){
+      WorkingHours workingHours = WorkingHours.builder()
+      .startDate(LocalDateTime.parse("2024-08-01T14:00"))
+      .endDate(LocalDateTime.parse("2024-08-01T20:00"))
+      .employee(employeeRepository.getReferenceById(2)) // Maria
+      .status(true)
+      .build();
+
+      workingHoursRepository.save(workingHours);
+    }
+
+    // Verificar si Producto existe
+    int product1 = 1;
+    if(!productRepository.existsById(product1)){
+      Product product = Product.builder()
+      .name("Corte de pelo")
+      .price(15000)
+      .duration(LocalTime.of(0,30)) // 30 minutos
+      .hairSalon(hairSalonRepository.getReferenceById(1)) // salon de prueba
+      .status(true)
+      .build();
+
+      productRepository.save(product);
+    }
+
+    // Verificar si Producto existe
+    int product2 = 2;
+    if(!productRepository.existsById(product2)){
+      Product product = Product.builder()
+      .name("Manicure")
+      .price(11000)
+      .duration(LocalTime.of(0,30)) // 30 minutos
+      .hairSalon(hairSalonRepository.getReferenceById(1)) // salon de prueba
+      .status(true)
+      .build();
+
+      productRepository.save(product);
+    }
+
+    // Verificar si Producto existe
+    int product3 = 3;
+    if(!productRepository.existsById(product3)){
+      Product product = Product.builder()
+      .name("Pedicure")
+      .price(12000)
+      .duration(LocalTime.of(0,30)) // 30 minutos
+      .hairSalon(hairSalonRepository.getReferenceById(1)) // salon de prueba
+      .status(true)
+      .build();
+
+      productRepository.save(product);
+    }
+
+    // Verificar si Cita existe
+    int appointment1 = 1;
+    if(!appointmentRepository.existsById(appointment1)){
+      Appointment appointment = Appointment.builder()
+      .date(LocalDate.of(2024,8,1))
+      .time(LocalTime.of(8, 0)) // 8 am
+      .notes("quiero un corte de pelo en capas")
+      .condition("pending")
+      .product(productRepository.getReferenceById(1)) // Corte de pelo
+      .employee(employeeRepository.getReferenceById(1)) // Alejandra
+      .client(clientRepository.getReferenceById(4)) // Pedro
+      .status(true)
+      .build();
+
+      appointmentRepository.save(appointment);
+    }
+
+    // Verificar si Cita existe
+    int appointment2 = 2;
+    if(!appointmentRepository.existsById(appointment2)){
+      Appointment appointment = Appointment.builder()
+      .date(LocalDate.of(2024,8,1))
+      .time(LocalTime.of(14, 0)) // 2 pm
+      .notes(null)
+      .condition("pending")
+      .product(productRepository.getReferenceById(2)) // Manicure
+      .employee(employeeRepository.getReferenceById(2)) // Maria
+      .client(clientRepository.getReferenceById(4)) // Pedro
+      .status(true)
+      .build();
+
+      appointmentRepository.save(appointment);
     }
   }
 

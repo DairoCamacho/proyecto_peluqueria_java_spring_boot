@@ -42,13 +42,13 @@ public class Appointment {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
-  @Column(name = "date", nullable = false)
+  @Column(name = "date_appointment", nullable = false)
   private LocalDate date;
 
-  @Column(name = "time", nullable = false)
+  @Column(name = "time_appointment", nullable = false)
   private LocalTime time;
 
-  @Column(name = "condition", nullable = false, length = 45)
+  @Column(name = "condition_appointment", nullable = false, length = 45)
   private String condition;
 
   @Column(name = "notes", length = 45)
