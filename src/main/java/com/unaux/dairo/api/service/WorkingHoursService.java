@@ -45,6 +45,11 @@ public class WorkingHoursService {
     return workingHoursRepository.findAll(pagination);
   }
 
+  public Page<WorkingHours> findAllEnabled(Pageable pagination) {
+    LocalDateTime currentDate = LocalDateTime.now();
+    return workingHoursRepository.findActiveWorkingHoursAfter(currentDate, pagination);
+  }
+
   public Optional<WorkingHours> findById(int id) {
     return workingHoursRepository.findById(id);
   }

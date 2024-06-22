@@ -78,6 +78,12 @@ public class WorkingHoursController {
     return ResponseEntity.ok(listWorkingHours.map(WorkingHoursFindDto::new));
   }
 
+  @GetMapping("/enabled")
+  public ResponseEntity<Page<WorkingHoursFindDto>> listEnabledWorkingHours(Pageable pagination) {
+    Page<WorkingHours> listWorkingHours = workingHoursService.findAllEnabled(pagination);
+    return ResponseEntity.ok(listWorkingHours.map(WorkingHoursFindDto::new));
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<?> findWorkingHours(@PathVariable int id) {
     // *** No hay validaciones menores para realizar

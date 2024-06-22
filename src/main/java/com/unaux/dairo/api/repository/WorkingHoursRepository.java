@@ -2,6 +2,8 @@ package com.unaux.dairo.api.repository;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -18,4 +20,7 @@ public interface WorkingHoursRepository extends JpaRepository<WorkingHours, Inte
         "OR (wh.endDate >= :startDate AND wh.endDate <= :endDate))" +
         ") THEN TRUE ELSE FALSE END")
   boolean existsByEmployeeIdAndOverlappingDate(int employeeId, LocalDateTime startDate, LocalDateTime endDate);
+  
+  @Query("SELECT wh FROM WorkingHours wh WHERE wh.status = true AND wh.startDate >= :currentDate")
+  Page<WorkingHours> findActiveWorkingHoursAfter(LocalDateTime currentDate, Pageable pagination);
   }
