@@ -2,11 +2,13 @@ package com.unaux.dairo.api.domain.product;
 
 import java.time.LocalTime;
 import java.util.Set;
+import java.util.List;
 
 import org.hibernate.Hibernate;
 
 import com.unaux.dairo.api.domain.appointment.Appointment;
 import com.unaux.dairo.api.domain.hairsalon.HairSalon;
+import com.unaux.dairo.api.domain.employee.Employee;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,6 +17,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -52,11 +55,14 @@ public class Product {
   private boolean status;
 
   @ManyToOne
-  @JoinColumn(name = "hair_salon_id", referencedColumnName = "id", nullable = false)
+  @JoinColumn(name = "hair_salon_id", referencedColumnName = "id", nullable = false) // en esta entidad se crea la columna hair_salon_id
   private HairSalon hairSalon;
 
-  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL) // en mappedBy ponemos el atributo de la tabla Appointment
   private Set<Appointment> appointments;
+
+  @ManyToMany(mappedBy= "products") // en mappedBy ponemos el atributo de la tabla Employee
+  private List<Employee> employees;
 
   public Product(String name2, int price2, LocalTime duration2, HairSalon hairSalon2) {
     setName(name2);

@@ -2,6 +2,7 @@ package com.unaux.dairo.api.domain.employee;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Set;
 
 public record EmployeeUpdateDto(
   @NotNull int id,
@@ -9,5 +10,6 @@ public record EmployeeUpdateDto(
   String position,
   Boolean status,
   LocalDate terminationDate,
-  int hairSalonId
+  int hairSalonId,
+  Set<Integer> productsId
 ) {}

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,9 +53,10 @@ public class EmployeeController {
     String position = employeeCreateDto.position();
     LocalDate hireDate = employeeCreateDto.hireDate();
     int hairSalonId = employeeCreateDto.hairSalonId();
+    Set<Integer> products = employeeCreateDto.productsId();
 
     try {
-      Employee employee = employeeService.save(clientId, position, hireDate, hairSalonId);
+      Employee employee = employeeService.save(clientId, position, hireDate, hairSalonId, products);
       // Creamos un Dto para retornar el objeto creado al frontend
       EmployeeResponseDto response = mapEmployeeToResponseDto(employee);
       // Aquí crearemos una url que corresponde al objeto que se creó en la base de datos.
@@ -111,9 +113,10 @@ public class EmployeeController {
     Boolean status = employeeUpdateDto.status();
     LocalDate terminationDate = employeeUpdateDto.terminationDate();
     int hairSalonId = employeeUpdateDto.hairSalonId();
+    Set<Integer> productsId = employeeUpdateDto.productsId();
 
     try {
-      Employee employee = employeeService.update(id, hireDate, position, status, terminationDate, hairSalonId);
+      Employee employee = employeeService.update(id, hireDate, position, status, terminationDate, hairSalonId, productsId);
       // creamos el DTO para la respuesta
       EmployeeResponseDto response = mapEmployeeToResponseDto(employee);
 
