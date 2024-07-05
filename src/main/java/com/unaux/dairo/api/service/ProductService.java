@@ -37,6 +37,10 @@ public class ProductService {
     return productRepository.findAll(pagination);
   }
 
+  public Page<Product> findEnabled(Pageable pagination) {
+    return productRepository.findByStatusTrue(pagination);
+  }
+
   public Optional<Product> findById(int id) {
     return productRepository.findById(id);
   }

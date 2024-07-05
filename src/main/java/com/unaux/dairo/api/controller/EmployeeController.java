@@ -80,6 +80,12 @@ public class EmployeeController {
     return ResponseEntity.ok(listEmployees.map(EmployeeFindDto::new));
   }
 
+  @GetMapping("/enabled")
+  public ResponseEntity<Page<EmployeeFindDto>> listEnabledStatusEmployee(Pageable pagination) {
+    Page<Employee> listEmployees = employeeService.findEnabled(pagination);
+    return ResponseEntity.ok(listEmployees.map(EmployeeFindDto::new));
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<?> findEmployee(@PathVariable int id) {
     // *** No hay validaciones menores para realizar

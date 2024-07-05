@@ -38,7 +38,7 @@ public class UserService {
     return userRepository.findAll(pagination);
   }
 
-  public Page<User> findByStatusTrue(Pageable pagination) {
+  public Page<User> findEnabled(Pageable pagination) {
     return userRepository.findByStatusTrue(pagination);
   }
 
@@ -46,7 +46,7 @@ public class UserService {
     return userRepository.findById(id);
   }
 
-  public User update(int id, String email, String newPassword) {
+  public User update(int id, String email, String password, String newPassword) {
     //! NO PERMITE ACTUALIZAR ROL o STATUS
     // *** validamos que no se pueda modificar el ID 1, ya que es el admin del sistema
     if (id == 1) {
@@ -63,7 +63,7 @@ public class UserService {
     // extraemos el password existente en DB
     String existingPassword = user.getPassword();
     // verificamos que la contraseña enviada coincida con la guardada en DB
-    if (!matchesPassword(newPassword, existingPassword)) {
+    if (!matchesPassword(password, existingPassword)) {
       throw new PasswordsDoNotMatchException("Passwords do not match");
     }
     // Actualizamos la Entidad con los datos del DTO

@@ -14,4 +14,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
   Page<Employee> findByTerminationDateNull(Pageable pageable);
 
   Optional<Employee> findByClientId(int clientId);
+
+  Page<Employee> findByStatusTrue(Pageable pagination);
 }

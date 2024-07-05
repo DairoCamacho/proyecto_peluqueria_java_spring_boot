@@ -26,6 +26,10 @@ public class HairSalonService {
     return hairSalonRepository.findAll(pagination);
   }
 
+  public Page<HairSalon> findEnabled(Pageable pagination) {
+    return hairSalonRepository.findByStatusTrue(pagination);
+  }
+
   public Optional<HairSalon> findById(int id) {
     return hairSalonRepository.findById(id);
   }

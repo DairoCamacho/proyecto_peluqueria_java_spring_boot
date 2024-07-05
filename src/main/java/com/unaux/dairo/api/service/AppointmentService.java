@@ -57,6 +57,10 @@ public class AppointmentService {
     return appointmentRepository.findAll(pagination);
   }
 
+  public Page<Appointment> findEnabled(Pageable pagination) {
+    return appointmentRepository.findByStatusTrue(pagination);
+  }
+
   public Optional<Appointment> findById(int id) {
     return appointmentRepository.findById(id);
   }

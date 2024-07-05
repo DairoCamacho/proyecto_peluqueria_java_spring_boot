@@ -22,5 +22,7 @@ public interface WorkingHoursRepository extends JpaRepository<WorkingHours, Inte
   boolean existsByEmployeeIdAndOverlappingDate(int employeeId, LocalDateTime startDate, LocalDateTime endDate);
   
   @Query("SELECT wh FROM WorkingHours wh WHERE wh.status = true AND wh.startDate >= :currentDate")
-  Page<WorkingHours> findActiveWorkingHoursAfter(LocalDateTime currentDate, Pageable pagination);
+  Page<WorkingHours> findEnabledWorkingHoursAfter(LocalDateTime currentDate, Pageable pagination);
+
+  Page<WorkingHours> findByStatusTrue(Pageable pagination);
   }

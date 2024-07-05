@@ -96,6 +96,12 @@ public class AppointmentController {
     return ResponseEntity.ok(ListAppointments.map(AppointmentFindDto::new));
   }
 
+  @GetMapping("/enabled")
+  public ResponseEntity<Page<AppointmentFindDto>> listEnabledStatusAppointment(Pageable pagination) {
+    Page<Appointment> ListAppointments = appointmentService.findEnabled(pagination);
+    return ResponseEntity.ok(ListAppointments.map(AppointmentFindDto::new));
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<?> findAppointment(@PathVariable int id) {
     // *** No hay validaciones menores para realizar

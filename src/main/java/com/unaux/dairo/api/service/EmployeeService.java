@@ -61,6 +61,10 @@ public class EmployeeService {
     return employeeRepository.findAll(pagination);
   }
 
+  public Page<Employee> findEnabled(Pageable pagination) {
+    return employeeRepository.findByStatusTrue(pagination);
+  }
+
   public Optional<Employee> findById(int id) {
     return employeeRepository.findById(id);
   }
