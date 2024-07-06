@@ -11,7 +11,8 @@ public record AppointmentFindDto(
   String notes,
   int product,
   int employee,
-  int client
+  int client,
+  Boolean status
 ) {
   public AppointmentFindDto(Appointment appointment){
     this(
@@ -22,7 +23,8 @@ public record AppointmentFindDto(
       appointment.getNotes(),
       appointment.getProduct().getId(),
       appointment.getEmployee().getId(),
-      appointment.getClient().getId()
+      appointment.getClient().getId(),
+      appointment.isStatus()
     );
   }
 }

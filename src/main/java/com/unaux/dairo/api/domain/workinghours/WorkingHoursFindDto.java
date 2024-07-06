@@ -6,14 +6,16 @@ public record WorkingHoursFindDto(
   int id,
   LocalDateTime startDate,
   LocalDateTime endDate,
-  int employeeId
+  int employeeId,
+  Boolean status
 ) {
   public WorkingHoursFindDto(WorkingHours workingHours) {
     this(
       workingHours.getId(),
       workingHours.getStartDate(),
       workingHours.getEndDate(),
-      workingHours.getEmployee().getId()
+      workingHours.getEmployee().getId(),
+      workingHours.isStatus()
     );
   }
 }

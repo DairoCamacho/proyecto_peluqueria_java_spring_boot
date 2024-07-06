@@ -89,8 +89,8 @@ public class UserController {
   }
 
   @GetMapping("/enabled")
-  public ResponseEntity<Page<UserFindDto>> listEnabledUsers(Pageable pagination) {
-    Page<User> listUsers = userService.findByStatusTrue(pagination);
+  public ResponseEntity<Page<UserFindDto>> listEnabledStatusUsers(Pageable pagination) {
+    Page<User> listUsers = userService.findEnabled(pagination);
     return ResponseEntity.ok(listUsers.map(UserFindDto::new));
   }
 
@@ -137,7 +137,7 @@ public class UserController {
     }
 
     try {
-      User user = userService.update(id, email, password);
+      User user = userService.update(id, email, password, newPassword);
       // Creamos un DTO para retornar el objeto al frontend
       UserResponseDto response = mapUserToResponseDto(user);
 

@@ -42,8 +42,7 @@ public class ClientService {
     return clientRepository.findAll(pagination);
   }
 
-  // TODO: VERIFICAR QUE FUNCIONE BIEN, SE CAMBIO EL METODO USADO EN EL REPOSITORIO
-  public Page<Client> findAllEnabled(Pageable pagination) {
+  public Page<Client> findEnabled(Pageable pagination) {
     return clientRepository.findByStatusTrue(pagination);
   }
 

@@ -82,8 +82,8 @@ public class ClientController {
   }
 
   @GetMapping("/enabled")
-  public ResponseEntity<Page<ClientFindDto>> listEnabledClient(Pageable pagination) {
-    Page<Client> ListClients = clientService.findAllEnabled(pagination);
+  public ResponseEntity<Page<ClientFindDto>> listEnabledStatusClient(Pageable pagination) {
+    Page<Client> ListClients = clientService.findEnabled(pagination);
     return ResponseEntity.ok(ListClients.map(ClientFindDto::new));
   }
 

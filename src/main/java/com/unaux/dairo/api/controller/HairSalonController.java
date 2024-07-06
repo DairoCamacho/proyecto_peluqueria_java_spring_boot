@@ -79,6 +79,12 @@ public class HairSalonController {
     return ResponseEntity.ok(listHairSalons.map(HairSalonFindDto::new)); // Mapeamos los registros a un DTO
   }
 
+  @GetMapping("/enabled")
+  public ResponseEntity<Page<HairSalonFindDto>> listEnabledStatusHairSalon(Pageable pagination) {
+    Page<HairSalon> listHairSalons = hairSalonService.findEnabled(pagination);
+    return ResponseEntity.ok(listHairSalons.map(HairSalonFindDto::new));
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<?> findHairSalon(@PathVariable int id) {
     // *** No hay validaciones menores para realizar

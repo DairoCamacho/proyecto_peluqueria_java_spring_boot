@@ -73,8 +73,14 @@ public class ProductController {
   }
 
   @GetMapping
-  public ResponseEntity<Page<ProductFindDto>> listAllService(Pageable pagination) {
+  public ResponseEntity<Page<ProductFindDto>> listAllProduct(Pageable pagination) {
     Page<Product> listProducts = productService.findAll(pagination);
+    return ResponseEntity.ok(listProducts.map(ProductFindDto::new));
+  }
+
+  @GetMapping("/enabled")
+  public ResponseEntity<Page<ProductFindDto>> listEnabledStatusProduct(Pageable pagination) {
+    Page<Product> listProducts = productService.findEnabled(pagination);
     return ResponseEntity.ok(listProducts.map(ProductFindDto::new));
   }
 
@@ -127,7 +133,7 @@ public class ProductController {
 
   @DeleteMapping("/{id}")
   @Transactional
-  public ResponseEntity<?> deleteService(@PathVariable int id) {
+  public ResponseEntity<?> deleteProduct(@PathVariable int id) {
     try {
       productService.delete(id);
       // Retornamos una respuesta vacía
