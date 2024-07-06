@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.3.0</version>
+    <relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.unaux.dairo</groupId>
 	<artifactId>api</artifactId>
@@ -41,7 +41,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<!-- 
+		<!--
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
@@ -79,12 +79,12 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope><!-- Solo funciona para hacer los test -->
 		</dependency>
-		<!-- 
+		<!--
 		<dependency>
 			<groupId>net.datafaker</groupId>
 			<artifactId>datafaker</artifactId>
 			<version>2.2.2</version>
-		</dependency> 
+		</dependency>
 		-->
 	</dependencies>
 
@@ -119,6 +119,14 @@
 								<goals>
 										<goal>report</goal>
 								</goals>
+								<configuration>
+									<excludes>
+										<exclude>**/Main.class</exclude><!-- Excluir del reporte Jacoco el metodo main-->
+										<exclude>**/ApiApplication.*</exclude>
+										<exclude>**/domain/**</exclude><!-- Excluir del reporte Jacoco las entidades -->
+										<exclude>**/infra/**</exclude><!-- Excluir del reporte Jacoco las entidades -->
+									</excludes>
+								</configuration>
 						</execution>
 						<execution>
 								<id>jacoco-check</id>
@@ -133,7 +141,7 @@
 																<limit>
 																		<counter>LINE</counter>
 																		<value>COVEREDRATIO</value>
-																		<minimum>0.0</minimum>  
+																		<minimum>0.1</minimum>  <!-- 85% (0.85) de porcentaje de umbral mínimo y 95% (0.95) máximo -->
 																</limit>
 														</limits>
 												</rule>

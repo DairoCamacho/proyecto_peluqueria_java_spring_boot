@@ -3,9 +3,10 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version '3.2.3'
-    id 'io.spring.dependency-management' version '1.1.0'
     id 'java'
+    id 'org.springframework.boot' version '3.3.0'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'jacoco'
 }
 
 repositories {
@@ -53,6 +54,11 @@ java {
     }
 }
 
+/* 
+java {
+  sourceCompatibility = '17'
+} 
+*/
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 
@@ -63,4 +69,70 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
+}
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+test {
+    useJUnitPlatform()
+}
+/*
+tasks.named('test') {
+  useJUnitPlatform()
+}
+*/
+// excluye las clases de Lombok del archivo JAR generado por Spring Boot.
+bootJar {
+    layered {
+        application {
+            intoLayer("spring-boot-loader") {
+                exclude("org/springframework/boot/devtools/**")
+            }
+            intoLayer("lombok") {
+                exclude("**/lombok/**")
+            }
+        }
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+// Excluir del reporte Jacoco el metodo main y las entidades
+jacocoTestReport {
+    reports {
+        // Establece la ruta del archivo de datos de ejecución de Jacoco
+        executionData = files('target/jacoco.exec')
+        //xml.enabled = true    // No es necesario usar 'enabled' aquí. Gradle lo infiere de 'executionData'
+        //html.enabled = true   // No es necesario usar 'enabled' aquí. Gradle lo infiere de 'executionData'
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/Main.class',
+                    '**/ApiApplication.*',
+                    '**/domain/**',
+                    '**/infra/**'
+            ])
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'PACKAGE'
+            enabled = true
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.1  // Puedes ajustar este valor según tus necesidades (0.85 para 85%, por ejemplo)
+            }
+        }
+    }
 }
