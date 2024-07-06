@@ -57,10 +57,10 @@ public class HairSalon {
   @Column(name = "status", nullable = false)
   private boolean status;
 
-  @OneToMany(mappedBy = "hairSalon", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "hairSalon", cascade = CascadeType.ALL) // en mappedBy ponemos el atributo de la tabla Employee
   private Set<Employee> employees;
 
-  @OneToMany(mappedBy = "hairSalon", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "hairSalon", cascade = CascadeType.ALL) // en mappedBy ponemos el atributo de la tabla Product
   private Set<Product> products;
 
   public HairSalon(String name2, String phone2, String address2, String neighborhood2, String city2, String country2) {

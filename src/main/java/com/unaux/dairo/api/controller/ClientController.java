@@ -33,7 +33,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("api/client")
+@RequestMapping("api/v1/client")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class ClientController {
@@ -61,7 +61,7 @@ public class ClientController {
       ClientResponseDto response = mapClientToResponseDto(client);
       // Aquí crearemos una url que corresponde al objeto que se creó en la base de datos.
       URI url = uriComponentsBuilder
-          .path("api/client/{id}")
+          .path("api/v1/client/{id}")
           .buildAndExpand(client.getId())
           .toUri();
 

@@ -34,7 +34,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("api/workinghours")
+@RequestMapping("api/v1/workinghours")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class WorkingHoursController {
@@ -59,7 +59,7 @@ public class WorkingHoursController {
       WorkingHoursResponseDto response = mapWorkingHoursToResponseDto(workingHours);
       // Aquí crearemos una url que corresponde al objeto que se creó en la base de datos.
       URI url = uriComponentsBuilder
-          .path("api/workinghours/{id}")
+          .path("api/v1/workinghours/{id}")
           .buildAndExpand(workingHours.getId())
           .toUri();
 

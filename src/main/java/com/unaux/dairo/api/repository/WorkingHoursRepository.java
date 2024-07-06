@@ -26,3 +26,5 @@ public interface WorkingHoursRepository extends JpaRepository<WorkingHours, Inte
 
   Page<WorkingHours> findByStatusTrue(Pageable pagination);
   }
+// La siguiente solo sirve para comparar dos workingHour exactas:
+// boolean existsByEmployeeIdAndStartDateAndEndDate(int employeeId, LocalDateTime startDate, LocalDateTime endDate);

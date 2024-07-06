@@ -34,7 +34,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("api/employee")
+@RequestMapping("api/v1/employee")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class EmployeeController {
@@ -61,7 +61,7 @@ public class EmployeeController {
       EmployeeResponseDto response = mapEmployeeToResponseDto(employee);
       // Aquí crearemos una url que corresponde al objeto que se creó en la base de datos.
       URI url = uriComponentsBuilder
-          .path("api/employee/{id}")
+          .path("api/v1/employee/{id}")
           .buildAndExpand(employee.getId())
           .toUri();
 
