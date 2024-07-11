@@ -16,7 +16,7 @@ Para desplegar este proyecto ejecute el comando:
 
 ```bash
   ./mvnw clean compile
-  ./mvnw -DskipTests=true install
+  ./mvnw -DskipTests=true install -P prod
 ```
 ```bash
    docker compose up
