@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
-// OncePerRequestFilter: Garantiza que el filtro se ejecute solo una vez por solicitud.
+// OncePerRequestFilter: Garantiza que el filtro se ejecute una vez por cada petición.
 public class SecurityFilter extends OncePerRequestFilter {
 
   private final TokenService tokenService;
@@ -37,10 +37,15 @@ public class SecurityFilter extends OncePerRequestFilter {
       // Remueve la parte "Bearer " del token, dejando solo la parte del token en sí.
       var token = authHeader.replace("Bearer ", "");
 
+      // extraemos el email (usuario) que viene dentro del token
+      // y lo almacena en la variable subject
       var subject = tokenService.getSubject(token);
 
+      // si el email no es nulo
       if (subject != null) {
-        // si el token es valido
+        // se puede agregar otra validación así:
+        // && SecurityContextHolder.getContext().getAuthentication() == null sirve
+        // para verificar que no esta aun autenticado
 
         // encontramos al usuario en la base de datos
         var user = userRepository.findByEmail(subject);

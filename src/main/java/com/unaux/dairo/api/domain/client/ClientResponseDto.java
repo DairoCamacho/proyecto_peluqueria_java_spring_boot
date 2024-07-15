@@ -3,11 +3,12 @@ package com.unaux.dairo.api.domain.client;
 import java.time.LocalDate;
 
 public record ClientResponseDto(
-        int id,
-        String name,
-        String lastName,
-        String phone,
-        LocalDate birthday,
-        String email,
-        String type) {
-}
+  int id,
+  LocalDate birthday,
+  String lastName,
+  String name,
+  String phone,
+  boolean status,
+  String type,
+  int userId
+) {}

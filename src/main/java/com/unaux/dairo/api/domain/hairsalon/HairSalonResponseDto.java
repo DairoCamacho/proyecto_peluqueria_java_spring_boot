@@ -7,5 +7,6 @@ public record HairSalonResponseDto(
   String address,
   String neighborhood,
   String city,
-  String country
+  String country,
+  boolean status
 ) {}

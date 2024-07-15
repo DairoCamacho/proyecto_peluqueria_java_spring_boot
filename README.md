@@ -16,8 +16,7 @@ Para desplegar este proyecto ejecute el comando:
 
 ```bash
   ./mvnw clean compile
-  ./mvnw -DskipTests=true install
-  
+  ./mvnw -DskipTests=true install -P prod
 ```
 ```bash
    docker compose up
@@ -43,5 +42,7 @@ Para este proyecto requiere el uso de [Docker Desktop](https://www.docker.com/pr
 sin embargo también puede ser desplegado haciendo uso  de los siguientes componentes:
   
   [jdk version 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
+
   [Maven](https://maven.apache.org/download.cgi)
+  
   [MySQL (Ejecutandose previamente)](https://www.apachefriends.org/download.html)
