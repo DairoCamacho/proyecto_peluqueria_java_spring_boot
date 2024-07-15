@@ -57,7 +57,7 @@ public class SecurityConfigurations {
       )
       .authorizeHttpRequests(authorize ->
         authorize
-          .requestMatchers(HttpMethod.POST,"/api/login", "/api/client").permitAll()
+          .requestMatchers(HttpMethod.POST,"/api/v1/login", "/api/v1/client").permitAll()
           .anyRequest().authenticated() // Cualquier otra solicitud que no coincida con las reglas anteriores requerirá autenticación. Permite acceso a cualquier otro recurso Sí está autenticado
           // .anyRequest().denyAll() // Se deniega el acceso a cualquier URL que aún no haya coincidido. Esta es una buena estrategia si no quiere olvidarse accidentalmente de actualizar sus reglas de autorización.
           // .requestMatchers("/admin/**").hasRole("ADMIN")

@@ -1,10 +1,10 @@
 services:
   java_app:
-    container_name: java_app
-    image: java-app:1.0.0
+    container_name: container-java
+    image: image-java
     build: .
     ports:
-      - "6543:8080"
+      - "8080:8080"
     environment:
       - DATABASE_URL=jdbc:mysql://java_db:3306/siac
       - DATABASE_USERNAME=root
@@ -15,7 +15,7 @@ services:
         condition: service_healthy
 
   java_db:
-    container_name: java_db
+    container_name: container-mysql
     image: mysql:8.0
     environment:
       - MYSQL_ROOT_PASSWORD=my-secret-pw
