@@ -56,7 +56,7 @@ public class SecurityFilter extends OncePerRequestFilter {
           null,
           user.getAuthorities()
         );
-        // settiamos manualmente esa autenticación
+        // configuramos manualmente esa autenticación
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
     }

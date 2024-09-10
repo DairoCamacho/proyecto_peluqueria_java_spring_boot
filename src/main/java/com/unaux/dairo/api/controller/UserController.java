@@ -68,7 +68,7 @@ public class UserController {
       return ResponseEntity
           .status(HttpStatus.BAD_REQUEST)
           .header("Error-Password", "password and confirmPassword do not match")
-          .body("password and confirmPassword do not match"); // remplazable por .build();
+          .body("password and confirmPassword do not match"); // se puede remplazar por .build();
     }
 
     try {
@@ -209,7 +209,7 @@ public class UserController {
   }
 
   private Map<String, Object> validatePasswordRequirements(Map<String, Object> errors, String password) {
-    // TODO: agregar más validaciónes para el password
+    // ToDo: agregar más validaciones para el password
     // e.i. que contenga una mayúscula, un número, un símbolo, extensión minima de 6 caracteres, etc.
     // se puede usar un regex
     if (password.isEmpty() || password.isBlank()) {

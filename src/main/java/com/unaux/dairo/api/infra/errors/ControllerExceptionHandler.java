@@ -15,7 +15,7 @@ public class ControllerExceptionHandler { // tratador de errores
   // Este método se ejecuta cuando se lanza una excepción de tipo EntityNotFoundException.
   // En este caso, simplemente devuelve una respuesta HTTP 404 (Not Found)
   @ExceptionHandler(EntityNotFoundException.class)
-  public ResponseEntity handlingError404() {
+  public ResponseEntity<?> handlingError404() {
     return ResponseEntity.notFound().build();
   }
 
@@ -24,7 +24,7 @@ public class ControllerExceptionHandler { // tratador de errores
   // Luego, crea una lista de objetos DataErrorValidationDto a partir de los errores de campo.
   // Finalmente, devuelve una respuesta HTTP 400 (Bad Request) con la lista de errores de validación.
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity handlingError400(MethodArgumentNotValidException e) {
+  public ResponseEntity<?> handlingError400(MethodArgumentNotValidException e) {
     var error = e
       .getFieldErrors()
       .stream()

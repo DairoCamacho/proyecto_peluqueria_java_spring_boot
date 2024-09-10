@@ -37,7 +37,7 @@ public class AuthenticationController {
   // Este método toma un objeto UserAuthenticationDto como parámetro, que
   // probablemente contiene las credenciales del usuario (email y password)
   @PostMapping
-  public ResponseEntity authenticateUser(
+  public ResponseEntity<JwtTokenDto> authenticateUser(
       @RequestBody @Valid UserAuthenticationDto userAuthenticationDto) {
     // creamos un token con las credenciales del usuario
     Authentication authToken = new UsernamePasswordAuthenticationToken(

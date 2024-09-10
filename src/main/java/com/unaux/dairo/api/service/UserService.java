@@ -2,8 +2,8 @@ package com.unaux.dairo.api.service;
 
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+// import org.apache.logging.log4j.LogManager;
+// import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,7 +18,7 @@ import com.unaux.dairo.api.repository.UserRepository;
 @Service
 public class UserService {
 
-  private static final Logger logger = LogManager.getLogger(UserService.class);
+  // private static final Logger logger = LogManager.getLogger(UserService.class);
   private final UserRepository userRepository;
 
   public UserService(UserRepository userRepository) {
