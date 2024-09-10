@@ -1,30 +1,29 @@
 services:
   java_app:
-    container_name: container-java
-    image: image-java
+    container_name: container-java-2
+    image: imagen-java
     build: .
     ports:
       - "8080:8080"
     environment:
-      - DATABASE_URL=jdbc:mysql://java_db:3306/siac
-      - DATABASE_USERNAME=root
-      - DATABASE_PASSWORD=my-secret-pw
+      - DATABASE_URL=jdbc:postgresql://container-cerrado-postgres-2:5432/postgres
+      - DATABASE_USERNAME=postgres 
+      - DATABASE_PASSWORD=password
       - JWT_SECRET=clave123
     depends_on:
       java_db:
         condition: service_healthy
 
   java_db:
-    container_name: container-mysql
-    image: mysql:8.0
-    environment:
-      - MYSQL_ROOT_PASSWORD=my-secret-pw
-      - MYSQL_DATABASE=siac
-    healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping -h localhost --silent" ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      container_name: container-cerrado-postgres-2
+      image: postgres
+      environment:
+        - POSTGRES_PASSWORD=password
+      healthcheck:
+        test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+        interval: 5s
+        timeout: 5s
+        retries: 10
 
 networks:
   backed:
