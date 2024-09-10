@@ -29,8 +29,7 @@ public class SecurityConfigurations {
   SecurityConfigurations(SecurityFilter securityFilter) {
     this.securityFilter = securityFilter;
   }
-
-  // Este método crea y configura un filtro de seguridad llamado springSecurityFilterChain.
+  // Este bean configura toda la seguridad de la API
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)
     throws Exception {
@@ -58,6 +57,8 @@ public class SecurityConfigurations {
       .authorizeHttpRequests(authorize ->
         authorize
           .requestMatchers(HttpMethod.POST,"/api/v1/login", "/api/v1/client", "/api/v1/user").permitAll()
+          .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+          // .requestMatchers("/actuator/**").permitAll() // Permitir acceso a los endpoints de Actuator
           .anyRequest().authenticated() // Cualquier otra solicitud que no coincida con las reglas anteriores requerirá autenticación. Permite acceso a cualquier otro recurso Sí está autenticado
           // .anyRequest().denyAll() // Se deniega el acceso a cualquier URL que aún no haya coincidido. Esta es una buena estrategia si no quiere olvidarse accidentalmente de actualizar sus reglas de autorización.
           // .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -70,7 +71,17 @@ public class SecurityConfigurations {
       );
     return httpSecurity.build();
   }
-
+/* 
+    // Este bean deja sin  seguridad toda la aplicación
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)
+      throws Exception {
+      httpSecurity
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+      return httpSecurity.build();
+    }
+*/
   // Este método crea y configura el AuthenticationManager, el cual es responsable de autenticar a los usuarios.
   // Se obtiene a través de la inyección de dependencias de AuthenticationConfiguration.
   @Bean
