@@ -55,7 +55,8 @@ public class DataLoader implements CommandLineRunner {
   @Override
   // @Transactional
   public void run(String... args) throws Exception {
-  /*   // Crear usuario
+
+    // Crear usuario
     String email1 = "user@admin.com";
     if (!userRepository.existsByEmail(email1)) {
       // Crear y guardar usuarios
@@ -258,6 +259,7 @@ public class DataLoader implements CommandLineRunner {
 
   public String encryptPassword(String password) {
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    return encoder.encode(password);*/
+    return encoder.encode(password);
+    
   }
 }
