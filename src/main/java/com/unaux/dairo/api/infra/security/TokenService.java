@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class TokenService {
 
-  @Value("${api.security.secret}")
+  @Value("${security.jwt.key.private}")
   private String apiSecret;
 
   public String createToken(User user) {
