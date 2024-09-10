@@ -38,11 +38,13 @@ El proyecto usa las siguientes variables de entorno:
 
 ## Requisitos previos
 
-Para este proyecto requiere el uso de [Docker Desktop](https://www.docker.com/products/docker-desktop/), 
-sin embargo también puede ser desplegado haciendo uso  de los siguientes componentes:
+Para este proyecto requiere el uso de los siguientes componentes:
   
   [jdk version 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 
   [Maven](https://maven.apache.org/download.cgi)
   
-  [MySQL (Ejecutandose previamente)](https://www.apachefriends.org/download.html)
+  [Postgresql (Ejecutandose previamente)](https://www.postgresql.org/download)
+
+Sin embargo, también puede ser desplegado haciendo uso [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
