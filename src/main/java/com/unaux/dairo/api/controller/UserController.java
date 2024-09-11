@@ -32,8 +32,16 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping("api/v1/user")
+@Tag(name = "User", description = "Controller for User management")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class UserController {
@@ -44,9 +52,46 @@ public class UserController {
     this.userService = userService;
   }
 
-  // @PostMapping
   // se usa dentro de clientController
   @PostMapping
+  @Operation(
+    summary = "Create User",
+    description = "Create a new user",
+    tags = {"User"},
+    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+      description = "User creation data",
+      required = true,
+      content = @io.swagger.v3.oas.annotations.media.Content(
+        mediaType = "application/json",
+        schema = @Schema(implementation = UserCreateDto.class)
+      )
+    ),
+    responses = {
+      @ApiResponse(
+        responseCode = "200",
+        description = "User created successfully",
+        content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = UserResponseDto.class),
+          examples = @ExampleObject(
+            name = "example",
+            value = "{\"id\": 1, \"email\": \"user@example.com\", \"role\": \"USER\", \"status\": true}"
+          )
+        )
+      ),
+      @ApiResponse(
+        responseCode = "400",
+        description = "Invalid input or email already exists",
+        content = @Content(
+          mediaType = "application/json",
+          examples = @ExampleObject(
+            name = "error",
+            value = "{\"message\": \"Invalid input or email already exists\"}"
+          )
+        )
+      )
+    }
+  )
   public ResponseEntity<?> createUser(@RequestBody @Valid UserCreateDto userCreateDto) {
     // Extraer los datos
     String email = userCreateDto.email();
@@ -83,18 +128,92 @@ public class UserController {
   }
 
   @GetMapping
+  @Operation(
+    summary = "List All Users",
+    description = "Retrieve a paginated list of all users",
+    tags = {"User"},
+    responses = {
+      @ApiResponse(
+        responseCode = "200",
+        description = "List of users retrieved successfully",
+        content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = Page.class),
+          examples = @ExampleObject(
+            name = "example",
+            value = "{\"content\": [{\"id\": 1, \"email\": \"user@example.com\", \"role\": \"USER\", \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+          )
+        )
+      )
+    }
+  )
   public ResponseEntity<Page<UserFindDto>> listAllUsers(Pageable pagination) {
     Page<User> listUsers = userService.findAll(pagination);
     return ResponseEntity.ok(listUsers.map(UserFindDto::new));
   }
 
   @GetMapping("/enabled")
+  @Operation(
+    summary = "List Enabled Users",
+    description = "Retrieve a paginated list of enabled users",
+    tags = {"User"},
+    responses = {
+      @ApiResponse(
+        responseCode = "200",
+        description = "List of enabled users retrieved successfully",
+        content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = Page.class),
+          examples = @ExampleObject(
+            name = "example",
+            value = "{\"content\": [{\"id\": 1, \"email\": \"user@example.com\", \"role\": \"USER\", \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+          )
+        )
+      )
+    }
+  )
   public ResponseEntity<Page<UserFindDto>> listEnabledStatusUsers(Pageable pagination) {
     Page<User> listUsers = userService.findEnabled(pagination);
     return ResponseEntity.ok(listUsers.map(UserFindDto::new));
   }
 
   @GetMapping("/{id}")
+  @Operation(
+    summary = "Find User by ID",
+    description = "Retrieve a user by their ID",
+    tags = {"User"},
+    parameters = @io.swagger.v3.oas.annotations.Parameter(
+      name = "id",
+      description = "ID of the user to be retrieved",
+      required = true,
+      example = "1"
+    ),
+    responses = {
+      @ApiResponse(
+        responseCode = "200",
+        description = "User retrieved successfully",
+        content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = UserResponseDto.class),
+          examples = @ExampleObject(
+            name = "example",
+            value = "{\"id\": 1, \"email\": \"user@example.com\", \"role\": \"USER\", \"status\": true}"
+          )
+        )
+      ),
+      @ApiResponse(
+        responseCode = "404",
+        description = "User not found",
+        content = @Content(
+          mediaType = "application/json",
+          examples = @ExampleObject(
+            name = "error",
+            value = "{\"code\": \"RESOURCE_NOT_FOUND\", \"message\": \"The requested resource was not found\", \"details\": \"No record with the ID 1 was found in the database.\"}"
+          )
+        )
+      )
+    }
+  )
   public ResponseEntity<?> findUser(@PathVariable int id) {
     // *** No hay validaciones menores para realizar
     Optional<User> userOptional = userService.findById(id);
@@ -118,6 +237,44 @@ public class UserController {
 
   @PutMapping
   @Transactional
+  @Operation(
+    summary = "Update User",
+    description = "Update an existing user",
+    tags = {"User"},
+    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+      description = "User update data",
+      required = true,
+      content = @Content(
+        mediaType = "application/json",
+        schema = @Schema(implementation = UserUpdateDto.class)
+      )
+    ),
+    responses = {
+      @ApiResponse(
+        responseCode = "200",
+        description = "User updated successfully",
+        content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = UserResponseDto.class),
+          examples = @ExampleObject(
+            name = "example",
+            value = "{\"id\": 1, \"email\": \"user@example.com\", \"role\": \"USER\", \"status\": true}"
+          )
+        )
+      ),
+      @ApiResponse(
+        responseCode = "400",
+        description = "Invalid input or resource not found",
+        content = @Content(
+          mediaType = "application/json",
+          examples = @ExampleObject(
+            name = "error",
+            value = "{\"message\": \"Invalid input or resource not found\"}"
+          )
+        )
+      )
+    }
+  )
   public ResponseEntity<?> updateUser(@RequestBody @Valid UserUpdateDto userUpdateDto) {
     //! NO PERMITE ACTUALIZAR ROL o STATUS
     // extraemos los datos recibidos del DTO
@@ -177,6 +334,34 @@ public class UserController {
 
   @DeleteMapping("/{id}")
   @Transactional
+  @Operation(
+    summary = "Delete User",
+    description = "Delete a user by their ID",
+    tags = {"User"},
+    parameters = @io.swagger.v3.oas.annotations.Parameter(
+      name = "id",
+      description = "ID of the user to be deleted",
+      required = true,
+      example = "1"
+    ),
+    responses = {
+      @ApiResponse(
+        responseCode = "204",
+        description = "User deleted successfully"
+      ),
+      @ApiResponse(
+        responseCode = "400",
+        description = "Resource not found",
+        content = @Content(
+          mediaType = "application/json",
+          examples = @ExampleObject(
+            name = "error",
+            value = "{\"message\": \"Resource not found\"}"
+          )
+        )
+      )
+    }
+  )
   public ResponseEntity<?> deleteUser(@PathVariable int id) {
     try {
       userService.delete(id);
