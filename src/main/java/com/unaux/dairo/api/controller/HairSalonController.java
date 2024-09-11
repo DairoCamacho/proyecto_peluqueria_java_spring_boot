@@ -26,12 +26,19 @@ import com.unaux.dairo.api.domain.hairsalon.HairSalonResponseDto;
 import com.unaux.dairo.api.domain.hairsalon.HairSalonUpdateDto;
 import com.unaux.dairo.api.service.HairSalonService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/hairsalon")
+@Tag(name = "HairSalon", description = "The HairSalon API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class HairSalonController {
@@ -43,6 +50,20 @@ public class HairSalonController {
   }
 
   @PostMapping
+  @Operation(summary = "Create a new hair salon", description = "Creates a new hair salon based on the given data")
+  @ApiResponse(responseCode = "200", description = "Hair salon created",
+               content = @Content(schema = @Schema(implementation = HairSalonResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"name\": \"Salon Name\", \"phone\": \"1234567890\", \"address\": \"123 Street\", \"neighborhood\": \"Downtown\", \"city\": \"City\", \"country\": \"Country\", \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "400", description = "Invalid input",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Invalid input\"}"
+                 )))
   public ResponseEntity<?> createHairSalon(UriComponentsBuilder uriComponentsBuilder,
       @RequestBody @Valid HairSalonCreateDto hairSalonCreateDto) {
     // Extraer los Datos
@@ -74,18 +95,46 @@ public class HairSalonController {
   }
 
   @GetMapping
+  @Operation(summary = "List all hair salons", description = "Get a paginated list of all hair salons")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = Page.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"content\": [{\"id\": 1, \"name\": \"Salon Name\", \"phone\": \"1234567890\", \"address\": \"123 Street\", \"neighborhood\": \"Downtown\", \"city\": \"City\", \"country\": \"Country\", \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+               )))
   public ResponseEntity<Page<HairSalonFindDto>> listAllHairSalon(Pageable pagination) {
     Page<HairSalon> listHairSalons = hairSalonService.findAll(pagination); // Obtenemos todos los registros de la base de datos
     return ResponseEntity.ok(listHairSalons.map(HairSalonFindDto::new)); // Mapeamos los registros a un DTO
   }
 
   @GetMapping("/enabled")
+  @Operation(summary = "List enabled hair salons", description = "Get a paginated list of all enabled hair salons")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = Page.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"content\": [{\"id\": 1, \"name\": \"Salon Name\", \"phone\": \"1234567890\", \"address\": \"123 Street\", \"neighborhood\": \"Downtown\", \"city\": \"City\", \"country\": \"Country\", \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+               )))
   public ResponseEntity<Page<HairSalonFindDto>> listEnabledStatusHairSalon(Pageable pagination) {
     Page<HairSalon> listHairSalons = hairSalonService.findEnabled(pagination);
     return ResponseEntity.ok(listHairSalons.map(HairSalonFindDto::new));
   }
 
   @GetMapping("/{id}")
+  @Operation(summary = "Find hair salon by ID", description = "Returns a single hair salon")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = HairSalonResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"name\": \"Salon Name\", \"phone\": \"1234567890\", \"address\": \"123 Street\", \"neighborhood\": \"Downtown\", \"city\": \"City\", \"country\": \"Country\", \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "404", description = "Hair salon not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"code\": \"RESOURCE_NOT_FOUND\", \"message\": \"The requested resource was not found\", \"details\": \"No record with the ID 1 was found in the database.\"}"
+                 )))
   public ResponseEntity<?> findHairSalon(@PathVariable int id) {
     // *** No hay validaciones menores para realizar
     Optional<HairSalon> hairSalonOptional = hairSalonService.findById(id);
@@ -110,6 +159,27 @@ public class HairSalonController {
 
   @PutMapping
   @Transactional
+  @Operation(summary = "Update an existing hair salon", description = "Updates a hair salon based on the given data")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+              content = @Content(schema = @Schema(implementation = HairSalonResponseDto.class),
+              examples = @ExampleObject(
+                name = "example",
+                value = "{\"id\": 1, \"name\": \"Salon XYZ\", \"address\": \"123 Main St\", \"phone\": \"1234567890\", \"status\": true, \"ownerId\": 1}"
+              )))
+  @ApiResponse(responseCode = "400", description = "Invalid input",
+              content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                  name = "error",
+                  value = "{\"message\": \"Invalid input\"}"
+                )))
+  @ApiResponse(responseCode = "404", description = "Hair salon not found",
+              content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                  name = "error",
+                  value = "{\"message\": \"Hair salon not found\"}"
+                )))
   public ResponseEntity<?> updateHairSalon(
       @RequestBody @Valid HairSalonUpdateDto hairSalonUpdateDto) {
     // Extraer los Datos
