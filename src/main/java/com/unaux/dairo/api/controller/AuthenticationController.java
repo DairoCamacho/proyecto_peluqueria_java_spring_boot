@@ -16,6 +16,7 @@ import com.unaux.dairo.api.infra.security.TokenService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,14 +56,42 @@ public class AuthenticationController {
         schema=@Schema(implementation = UserAuthenticationDto.class)
       )
     ),
-    responses= @ApiResponse(
-      responseCode = "200", 
-      description = "User authenticated and JWT token generated", 
-      content = @Content(
-        mediaType = "application/json", 
-        schema = @Schema(implementation = JwtTokenDto.class)
+    responses={
+      @ApiResponse(
+        responseCode = "200", 
+        description = "User authenticated and JWT token generated", 
+        content = @Content(
+          mediaType = "application/json", 
+          schema = @Schema(implementation = JwtTokenDto.class),
+          examples = @ExampleObject(
+            name = "example",
+            value = "{\"JwtToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"}"
+          )
+        )
+      ),
+      @ApiResponse(
+        responseCode = "400",
+        description = "Invalid credentials",
+        content = @Content(
+          mediaType = "application/json",
+          examples = @ExampleObject(
+            name = "error",
+            value = "{\"message\": \"Invalid credentials\"}"
+          )
+        )
+      ),
+      @ApiResponse(
+        responseCode = "500",
+        description = "Internal server error",
+        content = @Content(
+          mediaType = "application/json",
+          examples = @ExampleObject(
+            name = "error",
+            value = "{\"message\": \"Internal server error\"}"
+          )
+        )
       )
-    )
+    }
   )
   public ResponseEntity<JwtTokenDto> authenticateUser(
       @RequestBody @Valid UserAuthenticationDto userAuthenticationDto) {
