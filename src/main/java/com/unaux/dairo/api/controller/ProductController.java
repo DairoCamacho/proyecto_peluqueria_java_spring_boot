@@ -28,12 +28,19 @@ import com.unaux.dairo.api.domain.product.ProductUpdateDto;
 import com.unaux.dairo.api.infra.errors.ResourceNotFoundException;
 import com.unaux.dairo.api.service.ProductService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/product")
+@Tag(name = "Product", description = "The Product API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class ProductController {
@@ -45,6 +52,20 @@ public class ProductController {
   }
 
   @PostMapping
+  @Operation(summary = "Create a new product", description = "Creates a new product based on the given data")
+  @ApiResponse(responseCode = "201", description = "Product created",
+               content = @Content(schema = @Schema(implementation = ProductResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"name\": \"Product A\", \"price\": 100, \"duration\": \"01:00:00\", \"hairSalonId\": 1, \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "400", description = "Invalid input",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Invalid input\"}"
+                 )))
   public ResponseEntity<?> createProduct(UriComponentsBuilder uriComponentsBuilder,
       @RequestBody @Valid ProductCreateDto productCreateDto) {
     // Extraer los datos
@@ -73,18 +94,46 @@ public class ProductController {
   }
 
   @GetMapping
+  @Operation(summary = "List all products", description = "Get a paginated list of all products")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = Page.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"content\": [{\"id\": 1, \"name\": \"Product A\", \"price\": 100, \"duration\": \"01:00:00\", \"hairSalonId\": 1, \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+               )))
   public ResponseEntity<Page<ProductFindDto>> listAllProduct(Pageable pagination) {
     Page<Product> listProducts = productService.findAll(pagination);
     return ResponseEntity.ok(listProducts.map(ProductFindDto::new));
   }
 
   @GetMapping("/enabled")
+  @Operation(summary = "List enabled products", description = "Get a paginated list of all enabled products")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = Page.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"content\": [{\"id\": 1, \"name\": \"Product A\", \"price\": 100, \"duration\": \"01:00:00\", \"hairSalonId\": 1, \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+               )))
   public ResponseEntity<Page<ProductFindDto>> listEnabledStatusProduct(Pageable pagination) {
     Page<Product> listProducts = productService.findEnabled(pagination);
     return ResponseEntity.ok(listProducts.map(ProductFindDto::new));
   }
 
   @GetMapping("/{id}")
+  @Operation(summary = "Find product by ID", description = "Returns a single product")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = ProductResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"name\": \"Product A\", \"price\": 100, \"duration\": \"01:00:00\", \"hairSalonId\": 1, \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "404", description = "Resource not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"code\": \"RESOURCE_NOT_FOUND\", \"message\": \"The requested resource was not found\", \"details\": \"No record with the ID 1 was found in the database.\"}"
+                 )))
   public ResponseEntity<?> findProduct(@PathVariable int id) {
     // *** No hay validaciones menores para realizar
     Optional<Product> productOptional = productService.findById(id);
@@ -108,6 +157,27 @@ public class ProductController {
 
   @PutMapping
   @Transactional
+  @Operation(summary = "Update an existing product", description = "Updates a product based on the given data")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = ProductResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"name\": \"Product A\", \"price\": 100, \"duration\": \"01:00:00\", \"hairSalonId\": 1, \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "400", description = "Invalid input",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Invalid input\"}"
+                 )))
+  @ApiResponse(responseCode = "404", description = "Resource not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Resource not found with ID: __\"}"
+                 )))
   public ResponseEntity<?> updateProduct(@RequestBody @Valid ProductUpdateDto productUpdateDto) {
     // Extraer los Datos
     int id = productUpdateDto.id();
@@ -133,6 +203,15 @@ public class ProductController {
 
   @DeleteMapping("/{id}")
   @Transactional
+  @Operation(summary = "Delete a product", description = "Deletes a product")
+  @ApiResponse(responseCode = "204", description = "Successful operation")
+  @ApiResponse(responseCode = "404", description = "Resource not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Resource not found with ID: __\"}"
+                 )))
   public ResponseEntity<?> deleteProduct(@PathVariable int id) {
     try {
       productService.delete(id);
