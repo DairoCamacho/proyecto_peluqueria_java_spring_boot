@@ -41,7 +41,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/product")
-@Tag(name = "Product", description = "The Product API")
+@Tag(name = "7. Product", description = "The Product API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class ProductController {

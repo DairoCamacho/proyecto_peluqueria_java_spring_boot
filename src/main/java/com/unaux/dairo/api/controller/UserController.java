@@ -41,7 +41,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
 @RequestMapping("api/v1/user")
-@Tag(name = "User", description = "Controller for User management")
+@Tag(name = "2. User", description = "Controller for User management")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class UserController {

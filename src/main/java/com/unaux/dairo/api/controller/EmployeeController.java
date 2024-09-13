@@ -41,7 +41,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/employee")
-@Tag(name = "Employee", description = "The Employee API")
+@Tag(name = "5. Employee", description = "The Employee API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class EmployeeController {

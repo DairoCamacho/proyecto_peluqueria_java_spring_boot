@@ -39,7 +39,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/hairsalon")
-@Tag(name = "HairSalon", description = "The HairSalon API")
+@Tag(name = "4. HairSalon", description = "The HairSalon API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class HairSalonController {

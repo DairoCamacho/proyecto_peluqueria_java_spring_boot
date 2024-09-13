@@ -41,7 +41,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/workinghours")
-@Tag(name = "WorkingHours", description = "The Working Hours API")
+@Tag(name = "6. WorkingHours", description = "The Working Hours API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class WorkingHoursController {
