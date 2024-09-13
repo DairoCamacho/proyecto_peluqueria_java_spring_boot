@@ -15,8 +15,7 @@ https://github.com/DairoCamacho/api-springboot-hairsalon.git
 Para desplegar este proyecto ejecute el comando:
 
 ```bash
-  ./mvnw clean compile
-  ./mvnw -DskipTests=true install -P prod
+   mvn clean -DskipTests=true install -P prod
 ```
 ```bash
    docker compose up
