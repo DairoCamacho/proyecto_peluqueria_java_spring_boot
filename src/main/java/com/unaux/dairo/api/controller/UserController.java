@@ -61,7 +61,7 @@ public class UserController {
     requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
       description = "User creation data",
       required = true,
-      content = @io.swagger.v3.oas.annotations.media.Content(
+      content = @Content(
         mediaType = "application/json",
         schema = @Schema(implementation = UserCreateDto.class)
       )

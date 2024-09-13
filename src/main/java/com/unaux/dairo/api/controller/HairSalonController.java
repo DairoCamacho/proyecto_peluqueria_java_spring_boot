@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -166,7 +167,7 @@ public class HairSalonController {
                 name = "example",
                 value = "{\"id\": 1, \"name\": \"Salon XYZ\", \"address\": \"123 Main St\", \"phone\": \"1234567890\", \"status\": true, \"ownerId\": 1}"
               )))
-  @ApiResponse(responseCode = "400", description = "Invalid input",
+  @ApiResponse(responseCode = "403", description = "Invalid input",
               content = @Content(
                 mediaType = "application/json",
                 examples = @ExampleObject(
@@ -201,11 +202,20 @@ public class HairSalonController {
     } catch (EntityNotFoundException e) {
       String errorMessage = "Resource not found with ID: %d".formatted(hairSalonUpdateDto.id());
       return ResponseEntity.badRequest().body(errorMessage);
-    }
+    } 
   }
 
   @DeleteMapping("/{id}")
   @Transactional
+  @Operation(summary = "Delete a hair salon", description = "Deletes a hair salon")
+  @ApiResponse(responseCode = "204", description = "Successful operation")
+  @ApiResponse(responseCode = "404", description = "Resource not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Resource not found with ID: __\"}"
+                 )))
   public ResponseEntity<?> deleteHairSalon(@PathVariable int id) {
     try {
       hairSalonService.delete(id);
@@ -213,7 +223,7 @@ public class HairSalonController {
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
       String errorMessage = "Resource not found with ID: %d".formatted(id);
-      return ResponseEntity.badRequest().body(errorMessage);
+      return ((BodyBuilder) ResponseEntity.notFound()).body(errorMessage);
     }
   }
 
