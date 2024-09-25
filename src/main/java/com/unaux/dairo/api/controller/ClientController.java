@@ -28,12 +28,19 @@ import com.unaux.dairo.api.domain.client.ClientUpdateDto;
 import com.unaux.dairo.api.infra.errors.ResourceNotFoundException;
 import com.unaux.dairo.api.service.ClientService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/client")
+@Tag(name = "3. Client", description = "The Client API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class ClientController {
@@ -45,6 +52,20 @@ public class ClientController {
   }
 
   @PostMapping
+  @Operation(summary = "Create a new client", description = "Creates a new client based on the given data")
+  @ApiResponse(responseCode = "200", description = "Client created",
+  content = @Content(schema = @Schema(implementation = ClientResponseDto.class),
+  examples = @ExampleObject(
+    name = "example",
+    value = "{\"id\": 1, \"birthday\": \"1990-01-01\", \"lastName\": \"Doe\", \"name\": \"John\", \"phone\": \"1234567890\", \"status\": true, \"type\": \"REGULAR\", \"userId\": 1}"
+  )))
+  @ApiResponse(responseCode = "400", description = "Invalid input",
+    content = @Content(
+      mediaType = "application/json",
+      examples = @ExampleObject(
+        name = "error",
+        value = "{\"message\": \"Invalid input\"}"
+  )))
   public ResponseEntity<?> createClient(UriComponentsBuilder uriComponentsBuilder,
       @RequestBody @Valid ClientCreateDto clientCreateDto) {
     // Extraer datos
@@ -76,18 +97,46 @@ public class ClientController {
   }
 
   @GetMapping
+  @Operation(summary = "List all clients", description = "Get a paginated list of all clients")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = Page.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"content\": [{\"id\": 1, \"birthday\": \"1990-01-01\", \"lastName\": \"Doe\", \"name\": \"John\", \"phone\": \"1234567890\", \"status\": true, \"type\": \"REGULAR\", \"userId\": 1}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+               )))
   public ResponseEntity<Page<ClientFindDto>> listAllClient(Pageable pagination) {
     Page<Client> listClients = clientService.findAll(pagination);
     return ResponseEntity.ok(listClients.map(ClientFindDto::new));
   }
 
   @GetMapping("/enabled")
+  @Operation(summary = "List enabled clients", description = "Get a paginated list of all enabled clients")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+              content = @Content(schema = @Schema(implementation = Page.class),
+              examples = @ExampleObject(
+                name = "example",
+                value = "{\"content\": [{\"id\": 1, \"birthday\": \"1990-01-01\", \"lastName\": \"Doe\", \"name\": \"John\", \"phone\": \"1234567890\", \"status\": true, \"type\": \"REGULAR\", \"userId\": 1}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+              )))
   public ResponseEntity<Page<ClientFindDto>> listEnabledStatusClient(Pageable pagination) {
     Page<Client> ListClients = clientService.findEnabled(pagination);
     return ResponseEntity.ok(ListClients.map(ClientFindDto::new));
   }
 
   @GetMapping("/{id}")
+  @Operation(summary = "Find client by ID", description = "Returns a single client")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = ClientResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"birthday\": \"1990-01-01\", \"lastName\": \"Doe\", \"name\": \"John\", \"phone\": \"1234567890\", \"status\": true, \"type\": \"REGULAR\", \"userId\": 1}"
+               )))
+  @ApiResponse(responseCode = "404", description = "Client not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"code\": \"RESOURCE_NOT_FOUND\", \"message\": \"The requested resource was not found\", \"details\": \"No record with the ID 1 was found in the database.\"}"
+                 )))
   public ResponseEntity<?> findClient(@PathVariable int id) {
     // *** No hay validaciones menores para realizar
     Optional<Client> clientOptional = clientService.findById(id);
@@ -111,6 +160,34 @@ public class ClientController {
   }
 
   @PutMapping
+  @Operation(summary = "Update an existing client", description = "Updates a client based on the given data")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = ClientResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"birthday\": \"1990-01-01\", \"lastName\": \"Doe\", \"name\": \"John\", \"phone\": \"1234567890\", \"status\": true, \"type\": \"REGULAR\", \"userId\": 1}"
+               )))
+  @ApiResponse(responseCode = "400", description = "Invalid ID supplied",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Invalid ID supplied\"}"
+                 )))
+  @ApiResponse(responseCode = "400", description = "Invalid birthday supplied",
+                content = @Content(
+                  mediaType = "application/json",
+                  examples = @ExampleObject(
+                    name = "error",
+                    value = "{\"message\": \"error in Birthday\"}"
+                  )))
+  @ApiResponse(responseCode = "404", description = "Client not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Client not found\"}"
+                 )))
   public ResponseEntity<?> updateClient(@RequestBody @Valid ClientUpdateDto clientUpdateDto) {
     // Extraer datos
     int id = clientUpdateDto.id();
@@ -138,6 +215,15 @@ public class ClientController {
 
   @DeleteMapping("/{id}")
   @Transactional
+  @Operation(summary = "Delete a client", description = "Deletes a client")
+  @ApiResponse(responseCode = "204", description = "Successful operation")
+  @ApiResponse(responseCode = "400", description = "Invalid ID supplied",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Invalid ID supplied\"}"
+                 )))
   public ResponseEntity<?> deleteClient(@PathVariable int id) {
     try {
       clientService.delete(id);

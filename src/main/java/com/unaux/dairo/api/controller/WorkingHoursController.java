@@ -29,12 +29,19 @@ import com.unaux.dairo.api.infra.errors.DuplicateWorkingHoursException;
 import com.unaux.dairo.api.infra.errors.ResourceNotFoundException;
 import com.unaux.dairo.api.service.WorkingHoursService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/workinghours")
+@Tag(name = "6. WorkingHours", description = "The Working Hours API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class WorkingHoursController {
@@ -46,6 +53,27 @@ public class WorkingHoursController {
   }
 
   @PostMapping
+  @Operation(summary = "Create new working hours", description = "Creates new working hours for an employee")
+  @ApiResponse(responseCode = "201", description = "Working hours created",
+               content = @Content(schema = @Schema(implementation = WorkingHoursResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"startDate\": \"2023-01-01T09:00:00\", \"endDate\": \"2023-01-01T17:00:00\", \"employeeId\": 1, \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "400", description = "Invalid input",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Invalid input\"}"
+                 )))
+  @ApiResponse(responseCode = "400", description = "Duplicate working hours",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Working hours already exist for employee\"}"
+                 )))
   public ResponseEntity<?> createWorkingHours(UriComponentsBuilder uriComponentsBuilder,
       @RequestBody @Valid WorkingHoursCreateDto workingHoursCreateDto) {
     // Extraer los Datos
@@ -73,24 +101,59 @@ public class WorkingHoursController {
   }
 
   @GetMapping
+  @Operation(summary = "List all working hours", description = "Get a paginated list of all working hours")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = Page.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"content\": [{\"id\": 1, \"startDate\": \"2023-01-01T09:00:00\", \"endDate\": \"2023-01-01T17:00:00\", \"employeeId\": 1, \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+               )))
   public ResponseEntity<Page<WorkingHoursFindDto>> listAllWorkingHours(Pageable pagination) {
     Page<WorkingHours> listWorkingHours = workingHoursService.findAll(pagination);
     return ResponseEntity.ok(listWorkingHours.map(WorkingHoursFindDto::new));
   }
 
   @GetMapping("/enabled")
+  @Operation(summary = "List active working hours", description = "Get a paginated list of all active working hours")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = Page.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"content\": [{\"id\": 1, \"startDate\": \"2023-01-01T09:00:00\", \"endDate\": \"2023-01-01T17:00:00\", \"employeeId\": 1, \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+               )))
   public ResponseEntity<Page<WorkingHoursFindDto>> listEnabledStatusWorkingHours(Pageable pagination) {
     Page<WorkingHours> listWorkingHours = workingHoursService.findEnabled(pagination);
     return ResponseEntity.ok(listWorkingHours.map(WorkingHoursFindDto::new));
   }
 
   @GetMapping("/active")
+  @Operation(summary = "List active working hours", description = "Get a paginated list of all active working hours")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = Page.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"content\": [{\"id\": 1, \"startDate\": \"2023-01-01T09:00:00\", \"endDate\": \"2023-01-01T17:00:00\", \"employeeId\": 1, \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+               )))
   public ResponseEntity<Page<WorkingHoursFindDto>> listActiveWorkingHours(Pageable pagination) {
     Page<WorkingHours> listWorkingHours = workingHoursService.findActive(pagination);
     return ResponseEntity.ok(listWorkingHours.map(WorkingHoursFindDto::new));
   }
 
   @GetMapping("/{id}")
+  @Operation(summary = "Find working hours by ID", description = "Returns a single working hours record")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = WorkingHoursResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"startDate\": \"2023-01-01T09:00:00\", \"endDate\": \"2023-01-01T17:00:00\", \"employeeId\": 1, \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "404", description = "Working hours not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"code\": \"RESOURCE_NOT_FOUND\", \"message\": \"The requested resource was not found\", \"details\": \"No record with the ID 1 was found in the database.\"}"
+                 )))
   public ResponseEntity<?> findWorkingHours(@PathVariable int id) {
     // *** No hay validaciones menores para realizar
     Optional<WorkingHours> workingHoursOptional = workingHoursService.findById(id);
@@ -115,6 +178,27 @@ public class WorkingHoursController {
 
   @PutMapping
   @Transactional
+  @Operation(summary = "Update existing working hours", description = "Updates an existing working hours record")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = WorkingHoursResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"startDate\": \"2023-01-01T09:00:00\", \"endDate\": \"2023-01-01T17:00:00\", \"employeeId\": 1, \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "400", description = "Invalid input",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Invalid input\"}"
+                 )))
+  @ApiResponse(responseCode = "404", description = "Working hours not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Working hours not found\"}"
+                 )))
   public ResponseEntity<?> updateWorkingHours(@RequestBody WorkingHoursUpdateDto workingHoursUpdateDto) {
     // Extraer los datos
     int id = workingHoursUpdateDto.id();
@@ -135,6 +219,15 @@ public class WorkingHoursController {
 
   @DeleteMapping("/{id}")
   @Transactional
+  @Operation(summary = "Delete working hours", description = "Deletes a working hours record")
+  @ApiResponse(responseCode = "204", description = "Successful operation")
+  @ApiResponse(responseCode = "400", description = "Invalid ID supplied",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Invalid ID supplied\"}"
+                 )))
   public ResponseEntity<?> deleteWorkingHours(@PathVariable int id) {
     try {
       workingHoursService.delete(id);

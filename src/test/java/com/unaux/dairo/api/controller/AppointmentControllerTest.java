@@ -154,7 +154,7 @@ class AppointmentControllerTest {
         @Test
         void createAppointment_ShouldThrowResourceNotFoundException() {
                 // GIVEN
-                UriComponentsBuilder uri = UriComponentsBuilder.newInstance();
+                // UriComponentsBuilder uri = UriComponentsBuilder.newInstance();
                 AppointmentCreateDto appointmentCreateDto = new AppointmentCreateDto(
                                 LocalDate.now().plusDays(1),
                                 LocalTime.now(),

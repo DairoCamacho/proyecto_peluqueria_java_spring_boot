@@ -3,8 +3,6 @@ package com.unaux.dairo.api.infra.security;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -57,7 +55,8 @@ public class DataLoader implements CommandLineRunner {
   @Override
   // @Transactional
   public void run(String... args) throws Exception {
-  /*   // Crear usuario
+
+    // Crear usuario
     String email1 = "user@admin.com";
     if (!userRepository.existsByEmail(email1)) {
       // Crear y guardar usuarios
@@ -260,6 +259,7 @@ public class DataLoader implements CommandLineRunner {
 
   public String encryptPassword(String password) {
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    return encoder.encode(password);*/
+    return encoder.encode(password);
+    
   }
 }

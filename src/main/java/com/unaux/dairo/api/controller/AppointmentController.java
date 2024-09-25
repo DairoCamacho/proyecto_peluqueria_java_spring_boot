@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,12 +31,19 @@ import com.unaux.dairo.api.domain.appointment.AppointmentUpdateDto;
 import com.unaux.dairo.api.infra.errors.ResourceNotFoundException;
 import com.unaux.dairo.api.service.AppointmentService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/appointment")
+@Tag(name = "8. Appointment", description = "The Appointment API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class AppointmentController {
@@ -48,6 +56,27 @@ public class AppointmentController {
   }
 
   @PostMapping
+  @Operation(summary = "Create a new appointment", description = "Creates a new appointment based on the given data")
+  @ApiResponse(responseCode = "201", description = "Appointment created",
+               content = @Content(schema = @Schema(implementation = AppointmentResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"date\": \"2023-01-01\", \"time\": \"10:00:00\", \"condition\": \"pending\", \"notes\": \"First appointment\", \"product\": 1, \"employee\": 1, \"client\": 1, \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "400", description = "Invalid date",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"code\": \"BAD_REQUEST\", \"message\": \"Error in the request\", \"details\": \"The date and time is earlier than the current date.\"}"
+                 )))
+  @ApiResponse(responseCode = "404", description = "Resource  not found",
+                 content = @Content(
+                   mediaType = "application/json",
+                   examples = @ExampleObject(
+                     name = "error",
+                     value = "{\"message\": \"<Resource> not found with the ID: <id>\"}"
+                   )))
   public ResponseEntity<?> createAppointment(UriComponentsBuilder uriComponentsBuilder,
       @RequestBody @Valid AppointmentCreateDto appointmentCreateDto) {
     // Extraemos los datos del DTO
@@ -84,25 +113,53 @@ public class AppointmentController {
 
     } catch (ResourceNotFoundException e) {
       return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
+          .status(HttpStatus.NOT_FOUND)
           .header(e.getClass().getSimpleName(), e.getMessage())
           .body(e.getMessage());
     }
   }
 
   @GetMapping
+  @Operation(summary = "List all appointments", description = "Get a paginated list of all appointments")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = Page.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"content\": [{\"id\": 1, \"date\": \"2023-01-01\", \"time\": \"10:00:00\", \"condition\": \"pending\", \"notes\": \"First appointment\", \"product\": 1, \"employee\": 1, \"client\": 1, \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+               )))
   public ResponseEntity<Page<AppointmentFindDto>> listAllAppointment(Pageable pagination) {
     Page<Appointment> ListAppointments = appointmentService.findAll(pagination);
     return ResponseEntity.ok(ListAppointments.map(AppointmentFindDto::new));
   }
 
   @GetMapping("/enabled")
+  @Operation(summary = "List enabled appointments", description = "Get a paginated list of all enabled appointments")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = Page.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"content\": [{\"id\": 1, \"date\": \"2023-01-01\", \"time\": \"10:00:00\", \"condition\": \"pending\", \"notes\": \"First appointment\", \"product\": 1, \"employee\": 1, \"client\": 1, \"status\": true}], \"pageable\": \"INSTANCE\", \"totalPages\": 1, \"totalElements\": 1}"
+               )))
   public ResponseEntity<Page<AppointmentFindDto>> listEnabledStatusAppointment(Pageable pagination) {
     Page<Appointment> ListAppointments = appointmentService.findEnabled(pagination);
     return ResponseEntity.ok(ListAppointments.map(AppointmentFindDto::new));
   }
 
   @GetMapping("/{id}")
+  @Operation(summary = "Find appointment by ID", description = "Returns a single appointment")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = AppointmentResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"date\": \"2023-01-01\", \"time\": \"10:00:00\", \"condition\": \"pending\", \"notes\": \"First appointment\", \"product\": 1, \"employee\": 1, \"client\": 1, \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "404", description = "Appointment not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"code\": \"RESOURCE_NOT_FOUND\", \"message\": \"The requested resource was not found\", \"details\": \"No record with the ID 1 was found in the database.\"}"
+                 )))
   public ResponseEntity<?> findAppointment(@PathVariable int id) {
     // *** No hay validaciones menores para realizar
     Optional<Appointment> appointmentOptional = appointmentService.findById(id);
@@ -126,6 +183,33 @@ public class AppointmentController {
 
   @PutMapping
   @Transactional
+  @Operation(summary = "Update an existing appointment", description = "Updates an appointment based on the given data")
+  @ApiResponse(responseCode = "200", description = "Successful operation",
+               content = @Content(schema = @Schema(implementation = AppointmentResponseDto.class),
+               examples = @ExampleObject(
+                 name = "example",
+                 value = "{\"id\": 1, \"date\": \"2023-01-01\", \"time\": \"10:00:00\", \"condition\": \"pending\", \"notes\": \"First appointment\", \"product\": 1, \"employee\": 1, \"client\": 1, \"status\": true}"
+               )))
+  @ApiResponse(responseCode = "400", description = "Invalid date",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"code\": \"BAD_REQUEST\", \"message\": \"Error in the request\", \"details\": \"The date and time is earlier than the current date.\"}"
+                 )))
+  @ApiResponse(responseCode = "404", description = "Resource not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = {
+                  @ExampleObject(
+                  name = "error",
+                  value = "{\"message\": \"Appointment not found with ID: <id>\"}"
+                  ),
+                  @ExampleObject(
+                  name = "error",
+                  value = "{\"code\": \"BAD_REQUEST\", \"message\": \"Error in the request\", \"details\": \"The appointment time is already taken.\"}"
+                  )
+                }))
   public ResponseEntity<?> updateAppointment(
       @RequestBody @Valid AppointmentUpdateDto appointmentUpdateDto) {
     // Extraemos los datos
@@ -155,23 +239,32 @@ public class AppointmentController {
 
       return ResponseEntity.ok(response);
     } catch (EntityNotFoundException e) {
-      String errorMessage = "Resource not found with ID: %d".formatted(id);
-      return ResponseEntity.badRequest().body(errorMessage);
+      String errorMessage = "Appointment not found with ID: %d".formatted(id);
+      return ((BodyBuilder) ResponseEntity.notFound()).body(errorMessage);
     } catch (ResourceNotFoundException e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
+      return ((BodyBuilder) ResponseEntity.notFound()).body(e.getMessage());
     }
   }
 
   @DeleteMapping("/{id}")
   @Transactional
+  @Operation(summary = "Delete an appointment", description = "Deletes an appointment")
+  @ApiResponse(responseCode = "204", description = "Successful operation")
+  @ApiResponse(responseCode = "404", description = "Resource not found",
+               content = @Content(
+                 mediaType = "application/json",
+                 examples = @ExampleObject(
+                   name = "error",
+                   value = "{\"message\": \"Appointment not found with ID:<id>\"}"
+                 )))
   public ResponseEntity<?> deleteAppointment(@PathVariable int id) {
     try {
       appointmentService.delete(id);
       // Retornamos una respuesta vacía
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
-      String errorMessage = "Resource not found with ID: %d".formatted(id);
-      return ResponseEntity.badRequest().body(errorMessage);
+      String errorMessage = "Appointment not found with ID: %d".formatted(id);
+      return ((BodyBuilder) ResponseEntity.notFound()).body(errorMessage);
     }
   }
 

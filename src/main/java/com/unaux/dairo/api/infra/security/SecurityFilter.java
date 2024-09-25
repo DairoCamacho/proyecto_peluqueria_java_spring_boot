@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.springframework.lang.NonNull; // Import the NonNull annotation
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -26,9 +27,9 @@ public class SecurityFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(
-    HttpServletRequest request,
-    HttpServletResponse response,
-    FilterChain filterChain
+      @NonNull HttpServletRequest request,
+      @NonNull HttpServletResponse response,
+      @NonNull FilterChain filterChain
   ) throws ServletException, IOException {
     // Obtiene el token de autorización (Bearer token) desde la cabecera "Authorization" de la solicitud.
     var authHeader = request.getHeader("Authorization");
@@ -56,7 +57,7 @@ public class SecurityFilter extends OncePerRequestFilter {
           null,
           user.getAuthorities()
         );
-        // settiamos manualmente esa autenticación
+        // configuramos manualmente esa autenticación
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
     }
