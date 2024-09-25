@@ -25,7 +25,7 @@ import jakarta.validation.Valid;
 // Esta clase es un controlador REST que maneja las solicitudes relacionadas con la autenticación de usuarios.
 @RestController
 @RequestMapping("api/v1/login")
-@Tag(name = "Authentication", description = "Controller for Authentication")
+@Tag(name = "1. Authentication", description = "Controller for Authentication")
 public class AuthenticationController {
 
   // para disparar el proceso de autenticación en spring existe la clase

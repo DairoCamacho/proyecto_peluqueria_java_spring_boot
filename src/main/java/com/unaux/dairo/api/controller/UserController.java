@@ -41,7 +41,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
 @RequestMapping("api/v1/user")
-@Tag(name = "User", description = "Controller for User management")
+@Tag(name = "2. User", description = "Controller for User management")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class UserController {
@@ -61,7 +61,7 @@ public class UserController {
     requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
       description = "User creation data",
       required = true,
-      content = @io.swagger.v3.oas.annotations.media.Content(
+      content = @Content(
         mediaType = "application/json",
         schema = @Schema(implementation = UserCreateDto.class)
       )

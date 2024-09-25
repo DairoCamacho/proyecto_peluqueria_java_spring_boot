@@ -40,7 +40,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/client")
-@Tag(name = "Client", description = "The Client API")
+@Tag(name = "3. Client", description = "The Client API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class ClientController {

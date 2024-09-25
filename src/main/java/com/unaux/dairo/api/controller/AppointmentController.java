@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +43,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/appointment")
-@Tag(name = "Appointment", description = "The Appointment API")
+@Tag(name = "8. Appointment", description = "The Appointment API")
 // @PreAuthorize("hasRole('ADMIN')")
 // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class AppointmentController {
@@ -62,13 +63,20 @@ public class AppointmentController {
                  name = "example",
                  value = "{\"id\": 1, \"date\": \"2023-01-01\", \"time\": \"10:00:00\", \"condition\": \"pending\", \"notes\": \"First appointment\", \"product\": 1, \"employee\": 1, \"client\": 1, \"status\": true}"
                )))
-  @ApiResponse(responseCode = "400", description = "Invalid input",
+  @ApiResponse(responseCode = "400", description = "Invalid date",
                content = @Content(
                  mediaType = "application/json",
                  examples = @ExampleObject(
                    name = "error",
-                   value = "{\"message\": \"Invalid input\"}"
+                   value = "{\"code\": \"BAD_REQUEST\", \"message\": \"Error in the request\", \"details\": \"The date and time is earlier than the current date.\"}"
                  )))
+  @ApiResponse(responseCode = "404", description = "Resource  not found",
+                 content = @Content(
+                   mediaType = "application/json",
+                   examples = @ExampleObject(
+                     name = "error",
+                     value = "{\"message\": \"<Resource> not found with the ID: <id>\"}"
+                   )))
   public ResponseEntity<?> createAppointment(UriComponentsBuilder uriComponentsBuilder,
       @RequestBody @Valid AppointmentCreateDto appointmentCreateDto) {
     // Extraemos los datos del DTO
@@ -105,7 +113,7 @@ public class AppointmentController {
 
     } catch (ResourceNotFoundException e) {
       return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
+          .status(HttpStatus.NOT_FOUND)
           .header(e.getClass().getSimpleName(), e.getMessage())
           .body(e.getMessage());
     }
@@ -182,20 +190,26 @@ public class AppointmentController {
                  name = "example",
                  value = "{\"id\": 1, \"date\": \"2023-01-01\", \"time\": \"10:00:00\", \"condition\": \"pending\", \"notes\": \"First appointment\", \"product\": 1, \"employee\": 1, \"client\": 1, \"status\": true}"
                )))
-  @ApiResponse(responseCode = "400", description = "Invalid input",
+  @ApiResponse(responseCode = "400", description = "Invalid date",
                content = @Content(
                  mediaType = "application/json",
                  examples = @ExampleObject(
                    name = "error",
-                   value = "{\"message\": \"Invalid input\"}"
+                   value = "{\"code\": \"BAD_REQUEST\", \"message\": \"Error in the request\", \"details\": \"The date and time is earlier than the current date.\"}"
                  )))
-  @ApiResponse(responseCode = "404", description = "Appointment not found",
+  @ApiResponse(responseCode = "404", description = "Resource not found",
                content = @Content(
                  mediaType = "application/json",
-                 examples = @ExampleObject(
-                   name = "error",
-                   value = "{\"message\": \"Appointment not found\"}"
-                 )))
+                 examples = {
+                  @ExampleObject(
+                  name = "error",
+                  value = "{\"message\": \"Appointment not found with ID: <id>\"}"
+                  ),
+                  @ExampleObject(
+                  name = "error",
+                  value = "{\"code\": \"BAD_REQUEST\", \"message\": \"Error in the request\", \"details\": \"The appointment time is already taken.\"}"
+                  )
+                }))
   public ResponseEntity<?> updateAppointment(
       @RequestBody @Valid AppointmentUpdateDto appointmentUpdateDto) {
     // Extraemos los datos
@@ -225,10 +239,10 @@ public class AppointmentController {
 
       return ResponseEntity.ok(response);
     } catch (EntityNotFoundException e) {
-      String errorMessage = "Resource not found with ID: %d".formatted(id);
-      return ResponseEntity.badRequest().body(errorMessage);
+      String errorMessage = "Appointment not found with ID: %d".formatted(id);
+      return ((BodyBuilder) ResponseEntity.notFound()).body(errorMessage);
     } catch (ResourceNotFoundException e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
+      return ((BodyBuilder) ResponseEntity.notFound()).body(e.getMessage());
     }
   }
 
@@ -241,7 +255,7 @@ public class AppointmentController {
                  mediaType = "application/json",
                  examples = @ExampleObject(
                    name = "error",
-                   value = "{\"message\": \"Resource not found\"}"
+                   value = "{\"message\": \"Appointment not found with ID:<id>\"}"
                  )))
   public ResponseEntity<?> deleteAppointment(@PathVariable int id) {
     try {
@@ -249,8 +263,8 @@ public class AppointmentController {
       // Retornamos una respuesta vacía
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
-      String errorMessage = "Resource not found with ID: %d".formatted(id);
-      return ResponseEntity.badRequest().body(errorMessage);
+      String errorMessage = "Appointment not found with ID: %d".formatted(id);
+      return ((BodyBuilder) ResponseEntity.notFound()).body(errorMessage);
     }
   }
 
